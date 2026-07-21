@@ -7,12 +7,19 @@
   <style>
     :root {
       --primary: #2c3e50;
-      --accent: #3498db;
-      --danger: #e74c3c;
-      --warning: #e67e22;
-      --bg-color: #f4f7f6;
+      --primary-light: #34495e;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-bg: #fef2f2;
+      --warning: #f59e0b;
+      --warning-bg: #fffbeb;
+      --success: #10b981;
+      --bg-color: #f8fafc;
       --card-bg: #ffffff;
-      --border-color: #ddd;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-sub: #64748b;
     }
 
     body {
@@ -20,20 +27,72 @@
       margin: 0;
       padding: 16px;
       background-color: var(--bg-color);
-      color: #333;
+      color: var(--text-main);
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
     }
 
     h1 {
       color: var(--primary);
-      font-size: 1.5rem;
-      margin-top: 0;
+      font-size: 1.6rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     h2 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
+    /* 搜尋列美化 */
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      box-sizing: border-box;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: all 0.2s;
+    }
+
+    #search:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 1.1rem;
+    }
+
+    /* 容器網格排版 */
     .container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -44,15 +103,10 @@
     .section {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .section h2 {
-      margin-top: 0;
-      border-bottom: 2px solid var(--bg-color);
-      padding-bottom: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01);
+      transition: transform 0.2s;
     }
 
     .section ul {
@@ -61,100 +115,157 @@
       margin: 0;
     }
 
+    /* 單一食材卡片 */
     .item {
-      background: #fff;
-      border: 1px solid #ddd;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
       padding: 12px;
       margin: 8px 0;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
       gap: 8px;
+      transition: all 0.2s;
     }
 
-    /* 快到期樣式 (橘色/警告) */
+    .item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
     .item.expiring {
       border-color: var(--warning);
-      background-color: #fdfaf6;
+      background-color: var(--warning-bg);
     }
 
-    /* 已過期樣式 (紅色/危險) */
     .item.expired {
       border-color: var(--danger);
-      background-color: #fcf4f4;
+      background-color: var(--danger-bg);
     }
 
     .item-info {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
       width: 100%;
     }
 
+    .item-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .item-name {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--text-main);
     }
 
     .item-detail {
       font-size: 0.85rem;
-      color: #666;
+      color: var(--text-sub);
     }
 
-    .item.expiring .item-name,
-    .item.expiring .item-detail {
-      color: var(--warning);
+    /* 狀態標籤 */
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-block;
     }
-
-    .item.expired .item-name,
-    .item.expired .item-detail {
+    .badge.expired {
+      background-color: #fee2e2;
       color: var(--danger);
-      font-weight: bold;
+    }
+    .badge.expiring {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    /* 表單區塊 */
+    #add-form-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     label {
       display: block;
-      margin-top: 12px;
+      margin-top: 14px;
       font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-main);
     }
 
     input, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 4px;
+      padding: 10px 14px;
+      margin-top: 6px;
       box-sizing: border-box;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 16px; /* 防止 iOS 放大畫面 */
+      border-radius: 10px;
+      font-size: 16px;
       background: #fff;
+      transition: all 0.2s;
     }
 
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* 按鈕樣式 */
     button {
-      margin: 6px 4px 6px 0;
-      padding: 10px 16px;
-      font-size: 1rem;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: 500;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background-color: var(--accent);
       color: white;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
 
     button:active {
-      opacity: 0.8;
+      transform: scale(0.98);
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
     }
 
     button.secondary {
-      background-color: #95a5a6;
+      background-color: #64748b;
+    }
+    button.secondary:hover {
+      background-color: #475569;
     }
 
     button.danger {
-      background-color: var(--danger);
-      padding: 6px 10px;
+      background-color: #fee2e2;
+      color: var(--danger);
+      padding: 6px 12px;
       font-size: 0.85rem;
+    }
+    button.danger:hover {
+      background-color: #fecaca;
+    }
+
+    button.edit-btn {
+      background-color: #f1f5f9;
+      color: var(--text-main);
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    button.edit-btn:hover {
+      background-color: #e2e8f0;
     }
 
     .actions {
@@ -162,23 +273,10 @@
       gap: 6px;
       width: 100%;
       justify-content: flex-end;
+      margin-top: 4px;
     }
 
-    #search {
-      margin: 0 0 16px 0;
-      width: 100%;
-      font-size: 16px;
-    }
-
-    #add-form-container {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    /* 手機螢幕微調 */
+    /* 手機微調 */
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -186,36 +284,44 @@
       .container {
         grid-template-columns: 1fr;
       }
+      #add-form-container {
+        padding: 16px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>廚房食材管理系統</h1>
+  <header>
+    <h1>🍳 廚房食材管理系統</h1>
+  </header>
 
-  <input type="text" id="search" placeholder="🔍 輸入食材名稱搜尋..." />
+  <div class="search-wrapper">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="輸入食材名稱快速搜尋..." />
+  </div>
 
   <div class="container" id="sections"></div>
 
   <div id="add-form-container">
-    <h2 id="form-title">新增食材</h2>
+    <h2 id="form-title">✨ 新增食材</h2>
     <form id="add-form">
-      <label>食材名稱：<input type="text" id="name" required placeholder="例如：高麗菜" /></label>
+      <label>食材名稱：<input type="text" id="name" required placeholder="例如：高麗菜、雞蛋" /></label>
       <label>重量/數量：<input type="text" id="amount" required placeholder="例如：1顆 / 500g" /></label>
       <label>保存期限：<input type="date" id="expiry" required /></label>
-      <label>位置：
+      <label>儲放位置：
         <select id="location">
-          <option value="fridge-1">冰箱1</option>
-          <option value="fridge-2">冰箱2</option>
-          <option value="fridge-3">冰箱3</option>
-          <option value="fridge-4">冰箱4</option>
-          <option value="fridge-5">冰箱5</option>
-          <option value="storage-1">糧秣庫1</option>
-          <option value="storage-2">糧秣庫2</option>
+          <option value="fridge-1">冰箱 1</option>
+          <option value="fridge-2">冰箱 2</option>
+          <option value="fridge-3">冰箱 3</option>
+          <option value="fridge-4">冰箱 4</option>
+          <option value="fridge-5">冰箱 5</option>
+          <option value="storage-1">糧秣庫 1</option>
+          <option value="storage-2">糧秣庫 2</option>
           <option value="pantry">水果儲放區</option>
         </select>
       </label>
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button type="submit" id="submit-btn" style="flex: 2;">新增</button>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button type="submit" id="submit-btn" style="flex: 2;">確認新增</button>
         <button type="button" id="cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
       </div>
     </form>
@@ -239,7 +345,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM 元素
     const sectionsDiv = document.getElementById('sections');
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
@@ -261,15 +366,19 @@
         section.className = 'section';
         
         let titleName = "";
+        let icon = "❄️";
         if (loc.includes("fridge")) {
           titleName = `冰箱 ${loc.split("-")[1]}`;
+          icon = "❄️";
         } else if (loc.includes("storage")) {
           titleName = `糧秣庫 ${loc.split("-")[1]}`;
+          icon = "📦";
         } else if (loc === "pantry") {
           titleName = `水果儲放區`;
+          icon = "🍎";
         }
 
-        section.innerHTML = `<h2>${titleName}</h2><ul id="${loc}-list"></ul>`;
+        section.innerHTML = `<h2>${icon} ${titleName}</h2><ul id="${loc}-list"></ul>`;
         sectionsDiv.appendChild(section);
         sectionElements[loc] = section.querySelector('ul');
       });
@@ -302,11 +411,10 @@
         const expiryDate = toDate(item.expiry);
         const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
 
-        // 計算效期狀態
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // 將今天時間歸零以方便比較天數
+        today.setHours(0, 0, 0, 0);
 
-        let statusText = "";
+        let badgeHtml = "";
         if (expiryDate) {
           const expTime = new Date(expiryDate);
           expTime.setHours(0, 0, 0, 0);
@@ -315,20 +423,23 @@
 
           if (diffDays < 0) {
             li.classList.add("expired");
-            statusText = `❌ 已過期 (${Math.abs(diffDays)} 天)`;
+            badgeHtml = `<span class="badge expired">已過期 ${Math.abs(diffDays)} 天</span>`;
           } else if (diffDays === 0) {
             li.classList.add("expiring");
-            statusText = `⚠️ 今天到期`;
+            badgeHtml = `<span class="badge expiring">今天到期</span>`;
           } else if (diffDays <= 3) {
             li.classList.add("expiring");
-            statusText = `⚠️ 剩餘 ${diffDays} 天到期`;
+            badgeHtml = `<span class="badge expiring">剩餘 ${diffDays} 天</span>`;
           }
         }
 
         li.innerHTML = `
           <div class="item-info">
-            <span class="item-name">${item.name}</span>
-            <span class="item-detail">數量: ${item.amount || "未填"} | 期限: ${expiryText} ${statusText ? '| ' + statusText : ''}</span>
+            <div class="item-header-row">
+              <span class="item-name">${item.name}</span>
+              ${badgeHtml}
+            </div>
+            <span class="item-detail">數量：${item.amount || "未填"} &nbsp;|&nbsp; 期限：${expiryText}</span>
           </div>
         `;
 
@@ -337,8 +448,7 @@
 
         const editBtn = document.createElement('button');
         editBtn.textContent = "編輯";
-        editBtn.style.padding = "6px 10px";
-        editBtn.style.fontSize = "0.85rem";
+        editBtn.className = "edit-btn";
         editBtn.onclick = () => {
           document.getElementById('name').value = item.name;
           document.getElementById('amount').value = item.amount || "";
@@ -346,8 +456,8 @@
           document.getElementById('location').value = loc;
           editingId = item.id;
           
-          formTitle.textContent = "編輯食材";
-          submitBtn.textContent = "更新";
+          formTitle.textContent = "✏️ 編輯食材";
+          submitBtn.textContent = "確認更新";
           cancelEditBtn.style.display = "block";
           
           document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
@@ -385,8 +495,8 @@
     function resetForm() {
       form.reset();
       editingId = null;
-      formTitle.textContent = "新增食材";
-      submitBtn.textContent = "新增";
+      formTitle.textContent = "✨ 新增食材";
+      submitBtn.textContent = "確認新增";
       cancelEditBtn.style.display = "none";
     }
 
