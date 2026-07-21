@@ -2,64 +2,231 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>廚房食材管理系統</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2c3e50; }
-    .container { display: flex; flex-wrap: wrap; gap: 20px; }
-    .section { border: 1px solid #ccc; padding: 10px; width: 250px; flex: 1 1 250px; }
-    .item { margin: 5px 0; }
-    .item.expiring { color: red; font-weight: bold; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 5px; box-sizing: border-box; }
-    button { margin: 5px; padding: 5px 10px; }
-    .actions { margin-left: 10px; }
-    #search { margin: 15px 0; padding: 5px; width: 300px; box-sizing: border-box; }
-
-    /* 卡片模式 */
-    .card-mode .item {
-      border: 1px solid #aaa;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      background: #f9f9f9;
+    :root {
+      --primary: #2c3e50;
+      --accent: #3498db;
+      --danger: #e74c3c;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --border-color: #ddd;
     }
 
-    /* 手機版調整 */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background-color: var(--bg-color);
+      color: #333;
+    }
+
+    h1 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin-top: 0;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      border-bottom: 2px solid var(--bg-color);
+      padding-bottom: 8px;
+    }
+
+    .section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item.expiring {
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .item-detail {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .item.expiring .item-detail {
+      color: var(--danger);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 16px; /* 防止 iOS 放大畫面 */
+      background: #fff;
+    }
+
+    button {
+      margin: 6px 4px 6px 0;
+      padding: 10px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--accent);
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:active {
+      opacity: 0.8;
+    }
+
+    button.secondary {
+      background-color: #95a5a6;
+    }
+
+    button.danger {
+      background-color: var(--danger);
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    #search {
+      margin: 0 0 16px 0;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* 卡片模式 (全面升級手機友善卡片) */
+    .card-mode .item {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .card-mode .actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    #add-form-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* 手機螢幕微調 */
     @media (max-width: 600px) {
-      .section { flex: 1 1 100%; max-width: 100%; }
-      #search { width: 100%; }
-      form { width: 100%; }
-      input, select, button { font-size: 16px; }
+      body {
+        padding: 10px;
+      }
+      .container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <h1>廚房食材管理系統</h1>
 
-  <input type="text" id="search" placeholder="輸入食材名稱搜尋..." />
-  <button id="toggleMode">切換顯示模式</button>
+  <input type="text" id="search" placeholder="🔍 輸入食材名稱搜尋..." />
+  
+  <div class="controls-bar">
+    <button id="toggleMode" class="secondary" style="flex:1;">切換卡片/清單模式</button>
+  </div>
 
   <div class="container" id="sections"></div>
 
-  <h2>新增食材</h2>
-  <form id="add-form">
-    <label>食材名稱：<input type="text" id="name" required /></label>
-    <label>重量/數量：<input type="text" id="amount" required /></label>
-    <label>保存期限：<input type="date" id="expiry" required /></label>
-    <label>位置：
-      <select id="location">
-        <option value="fridge-1">冰箱1</option>
-        <option value="fridge-2">冰箱2</option>
-        <option value="fridge-3">冰箱3</option>
-        <option value="fridge-4">冰箱4</option>
-        <option value="fridge-5">冰箱5</option>
-        <option value="storage-1">糧秣庫1</option>
-        <option value="storage-2">糧秣庫2</option>
-      </select>
-    </label>
-    <button type="submit">新增</button>
-  </form>
+  <div id="add-form-container">
+    <h2 id="form-title">新增食材</h2>
+    <form id="add-form">
+      <label>食材名稱：<input type="text" id="name" required placeholder="例如：高麗菜" /></label>
+      <label>重量/數量：<input type="text" id="amount" required placeholder="例如：1顆 / 500g" /></label>
+      <label>保存期限：<input type="date" id="expiry" required /></label>
+      <label>位置：
+        <select id="location">
+          <option value="fridge-1">冰箱1</option>
+          <option value="fridge-2">冰箱2</option>
+          <option value="fridge-3">冰箱3</option>
+          <option value="fridge-4">冰箱4</option>
+          <option value="fridge-5">冰箱5</option>
+          <option value="storage-1">糧秣庫1</option>
+          <option value="storage-2">糧秣庫2</option>
+        </select>
+      </label>
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button type="submit" id="submit-btn" style="flex: 2;">新增</button>
+        <button type="button" id="cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
+      </div>
+    </form>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -84,18 +251,19 @@
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
     const toggleBtn = document.getElementById('toggleMode');
+    const formTitle = document.getElementById('form-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit');
 
     let editingId = null;
     let allItems = [];
-    let cardMode = false;
+    let cardMode = true; // 手機優先，預設開啟卡片模式
 
-    // 定義位置並建立區塊
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
 
-    // 防呆：確保 sectionsDiv 存在
     if (!sectionsDiv) {
-      console.error("找不到 #sections 容器，請確認 HTML 有 <div id='sections'></div>");
+      console.error("找不到 #sections 容器");
     } else {
       locations.forEach(loc => {
         const section = document.createElement('div');
@@ -104,85 +272,84 @@
         sectionsDiv.appendChild(section);
         sectionElements[loc] = section.querySelector('ul');
       });
-      console.log("已建立的區塊 keys:", Object.keys(sectionElements));
     }
 
-    // 轉換 expiry 到 Date 的 helper
     function toDate(value) {
       if (!value) return null;
-      // Firestore Timestamp
       if (typeof value === 'object' && typeof value.toDate === 'function') {
         return value.toDate();
       }
-      // ISO 字串或其他可解析格式
       const d = new Date(value);
       if (!isNaN(d)) return d;
       return null;
     }
 
     function renderList(items) {
-      // 清空所有區域（防呆）
       locations.forEach(loc => {
         if (sectionElements[loc]) sectionElements[loc].innerHTML = "";
       });
 
-      // 如果 items 不是陣列，直接返回
-      if (!Array.isArray(items)) {
-        console.warn("renderList 收到非陣列 items:", items);
-        return;
-      }
+      if (!Array.isArray(items)) return;
 
       items.forEach((item) => {
-        // 防呆：確保 item 有 id 與 name
-        if (!item || !item.name) {
-          console.warn("跳過不完整的 item:", item);
-          return;
-        }
+        if (!item || !item.name) return;
 
-        // 預設 location（若文件沒有 location）
         const loc = item.location || "fridge-1";
-
-        // debug log：顯示 location 與是否有對應區塊
-        console.log("顯示位置:", loc, "是否存在:", !!sectionElements[loc], "docId:", item.id);
-
         const li = document.createElement('li');
         li.className = 'item';
 
         const expiryDate = toDate(item.expiry);
         const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
-        li.textContent = `${item.name} - ${item.amount || ""} (期限: ${expiryText})`;
 
         const today = new Date();
+        let isExpiring = false;
         if (expiryDate) {
           const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-          if (diffDays <= 3) li.classList.add("expiring");
+          if (diffDays <= 3) isExpiring = true;
         }
+
+        if (isExpiring) li.classList.add("expiring");
+
+        // 結構化資訊顯示
+        li.innerHTML = `
+          <div class="item-info">
+            <span class="item-name">${item.name}</span>
+            <span class="item-detail">數量: ${item.amount || "未填"} | 期限: ${expiryText} ${isExpiring ? '⚠️就快到期' : ''}</span>
+          </div>
+        `;
 
         const actions = document.createElement('span');
         actions.className = 'actions';
 
         const editBtn = document.createElement('button');
         editBtn.textContent = "編輯";
+        editBtn.style.padding = "6px 10px";
+        editBtn.style.fontSize = "0.85rem";
         editBtn.onclick = () => {
           document.getElementById('name').value = item.name;
           document.getElementById('amount').value = item.amount || "";
-          if (expiryDate) {
-            document.getElementById('expiry').value = expiryDate.toISOString().split("T")[0];
-          } else {
-            document.getElementById('expiry').value = "";
-          }
+          document.getElementById('expiry').value = expiryDate ? expiryDate.toISOString().split("T")[0] : "";
           document.getElementById('location').value = loc;
           editingId = item.id;
+          
+          formTitle.textContent = "編輯食材";
+          submitBtn.textContent = "更新";
+          cancelEditBtn.style.display = "block";
+          
+          // 自動滾動到表單位置方便修改
+          document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
         };
 
         const delBtn = document.createElement('button');
         delBtn.textContent = "刪除";
+        delBtn.className = "danger";
         delBtn.onclick = async () => {
-          try {
-            await deleteDoc(doc(db, "ingredients", item.id));
-            console.log("已刪除:", item.id);
-          } catch (err) {
-            console.error("刪除失敗:", err);
+          if (confirm(`確定要刪除「${item.name}」嗎？`)) {
+            try {
+              await deleteDoc(doc(db, "ingredients", item.id));
+            } catch (err) {
+              console.error("刪除失敗:", err);
+            }
           }
         };
 
@@ -190,16 +357,13 @@
         actions.appendChild(delBtn);
         li.appendChild(actions);
 
-        // 防呆 append：若找不到對應區塊，放到第一個區塊並在 console 警告
         if (sectionElements[loc]) {
           sectionElements[loc].appendChild(li);
         } else {
-          console.warn("找不到區塊:", loc, "將放到 fridge-1 作為 fallback。 docId:", item.id);
           sectionElements["fridge-1"].appendChild(li);
         }
       });
 
-      // 切換卡片樣式
       if (cardMode) {
         sectionsDiv.classList.add("card-mode");
       } else {
@@ -207,40 +371,47 @@
       }
     }
 
-    // 監聽 Firestore 資料
+    // 取消編輯按鈕事件
+    cancelEditBtn.addEventListener('click', () => {
+      resetForm();
+    });
+
+    function resetForm() {
+      form.reset();
+      editingId = null;
+      formTitle.textContent = "新增食材";
+      submitBtn.textContent = "新增";
+      cancelEditBtn.style.display = "none";
+    }
+
     onSnapshot(collection(db, "ingredients"), (snapshot) => {
       allItems = [];
       snapshot.forEach((docSnap) => {
         allItems.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // 排序（依 expiry）
       allItems.sort((a, b) => {
-        const dateA = toDate(a.expiry) || new Date(8640000000000000); // 無期限放最後
+        const dateA = toDate(a.expiry) || new Date(8640000000000000);
         const dateB = toDate(b.expiry) || new Date(8640000000000000);
         return dateA - dateB;
       });
 
-      console.log("從 Firestore 取得資料筆數:", allItems.length);
       renderList(allItems);
     }, (err) => {
       console.error("onSnapshot 錯誤:", err);
     });
 
-    // 搜尋
     searchInput.addEventListener('input', () => {
       const keyword = searchInput.value.toLowerCase();
       const filtered = allItems.filter(item => (item.name || "").toLowerCase().includes(keyword));
       renderList(filtered);
     });
 
-    // 切換顯示模式
     toggleBtn.addEventListener('click', () => {
       cardMode = !cardMode;
       renderList(allItems);
     });
 
-    // 新增 / 更新
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
@@ -262,24 +433,21 @@
             location,
             updatedAt: new Date()
           });
-          console.log("已更新:", editingId);
           editingId = null;
         } else {
-          const docRef = await addDoc(collection(db, "ingredients"), {
+          await addDoc(collection(db, "ingredients"), {
             name,
             amount,
             expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null,
             location,
             createdAt: new Date()
           });
-          console.log("已新增 docId:", docRef.id, "location:", location);
         }
+        resetForm();
       } catch (err) {
         console.error("寫入 Firestore 失敗:", err);
-        alert("儲存失敗，請查看 console 錯誤訊息");
+        alert("儲存失敗，請檢查網路連線");
       }
-
-      form.reset();
     });
   </script>
 </body>
