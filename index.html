@@ -39,6 +39,19 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .user-info-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      padding: 6px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.85rem;
     }
 
     h1 {
@@ -73,10 +86,9 @@
     }
 
     #app-container {
-      display: none; /* 預設隱藏，登入後才顯示 */
+      display: none;
     }
 
-    /* Google 登入按鈕樣式 */
     .google-btn {
       display: flex;
       align-items: center;
@@ -106,7 +118,6 @@
       height: 20px;
     }
 
-    /* 分頁切換頁籤 */
     .tabs {
       display: flex;
       gap: 10px;
@@ -140,7 +151,6 @@
       display: block;
     }
 
-    /* 搜尋與篩選列 */
     .search-wrapper {
       position: relative;
       margin-bottom: 16px;
@@ -173,7 +183,6 @@
       font-size: 1.1rem;
     }
 
-    /* 分類篩選按鈕列 */
     .filter-tags {
       display: flex;
       gap: 8px;
@@ -199,7 +208,6 @@
       border-color: var(--accent);
     }
 
-    /* 容器網格排版 */
     .container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -212,7 +220,7 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
     }
 
     .section ul {
@@ -221,7 +229,6 @@
       margin: 0;
     }
 
-    /* 庫存卡片樣式 */
     .item {
       background: #ffffff;
       border: 1px solid var(--border-color);
@@ -232,10 +239,6 @@
       flex-direction: column;
       gap: 8px;
       transition: all 0.2s;
-    }
-
-    .item:hover {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .item.expiring {
@@ -272,7 +275,6 @@
       color: var(--text-sub);
     }
 
-    /* 外部食譜網站推薦快捷專區樣式 */
     .external-links-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -291,13 +293,11 @@
       text-decoration: none;
       color: var(--text-main);
       transition: all 0.2s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.01);
     }
 
     .external-link-card:hover {
       border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
     }
 
     .external-link-icon {
@@ -316,7 +316,6 @@
       font-size: 0.95rem;
       margin: 0 0 2px 0;
       color: var(--primary);
-      font-weight: 600;
     }
 
     .external-link-info p {
@@ -325,7 +324,6 @@
       color: var(--text-sub);
     }
 
-    /* 質感網頁風：日常料理精選卡片樣式 */
     .web-showcase-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -340,13 +338,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-    }
-
-    .recipe-showcase-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
     }
 
     .recipe-card-banner {
@@ -382,9 +374,6 @@
     .recipe-meta-row {
       font-size: 0.85rem;
       color: var(--text-sub);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .recipe-steps-box {
@@ -407,7 +396,6 @@
       gap: 8px;
     }
 
-    /* 狀態標籤 */
     .badge {
       font-size: 0.75rem;
       padding: 2px 8px;
@@ -419,13 +407,11 @@
     .badge.expiring { background-color: #fef3c7; color: #d97706; }
     .badge.category { background-color: rgba(255, 255, 255, 0.2); color: #fff; }
 
-    /* 表單區塊 */
     .form-container {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       padding: 20px;
       border-radius: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
       max-width: 600px;
       margin: 0 auto 24px auto;
     }
@@ -435,7 +421,6 @@
       margin-top: 14px;
       font-weight: 500;
       font-size: 0.9rem;
-      color: var(--text-main);
     }
 
     input, select, textarea {
@@ -447,17 +432,9 @@
       border-radius: 10px;
       font-size: 16px;
       background: #fff;
-      transition: all 0.2s;
       font-family: inherit;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    /* 按鈕樣式 */
     button {
       padding: 10px 18px;
       font-size: 0.95rem;
@@ -467,41 +444,12 @@
       background-color: var(--accent);
       color: white;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
     }
-
-    button:active { transform: scale(0.98); }
     button:hover { background-color: var(--accent-hover); }
-
     button.secondary { background-color: #64748b; }
-    button.secondary:hover { background-color: #475569; }
-
-    button.danger {
-      background-color: #fee2e2;
-      color: var(--danger);
-      padding: 6px 12px;
-      font-size: 0.85rem;
-    }
-    button.danger:hover { background-color: #fecaca; }
-
-    button.edit-btn {
-      background-color: #f1f5f9;
-      color: var(--text-main);
-      padding: 6px 12px;
-      font-size: 0.85rem;
-    }
-    button.edit-btn:hover { background-color: #e2e8f0; }
-
-    .actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    @media (max-width: 600px) {
-      body { padding: 10px; }
-      .container { grid-template-columns: 1fr; }
-      .form-container { padding: 16px; }
-    }
+    button.danger { background-color: #fee2e2; color: var(--danger); padding: 6px 12px; font-size: 0.85rem; }
+    button.edit-btn { background-color: #f1f5f9; color: var(--text-main); padding: 6px 12px; font-size: 0.85rem; }
+    .actions { display: flex; gap: 6px; }
   </style>
 </head>
 <body>
@@ -527,10 +475,14 @@
   <div id="app-container">
     <header>
       <h1>🍳 廚房與每週菜單管理系統</h1>
-      <button id="logout-btn" class="secondary" style="padding: 6px 12px; font-size: 0.85rem;">登出</button>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="user-info-bar">
+          <span>👤 登入帳號：<strong id="user-email-display">載入中...</strong></span>
+        </div>
+        <button id="logout-btn" class="secondary" style="padding: 6px 12px; font-size: 0.85rem;">登出</button>
+      </div>
     </header>
 
-    <!-- 上方頁籤切換 -->
     <div class="tabs">
       <button class="tab-btn active" id="tab-inventory-btn">📦 食材庫存管理</button>
       <button class="tab-btn" id="tab-recipe-btn">📖 每週開菜單料理參考庫</button>
@@ -576,27 +528,23 @@
       <div class="section" style="margin-bottom: 16px; background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border-color: #bfdbfe;">
         <h2>💡 每週開菜單靈感提示</h2>
         <p style="margin: 0; font-size: 0.9rem; color: var(--text-sub);">
-          這是一個專門用來在每週提早開立菜單時查詢、挑選的料理資料庫。您可以直接點擊下方外部熱門食譜網站找尋靈感，或透過系統中的精選卡片牆與分類快速過濾您的私房菜！
+          這是一個專門用來在每週提早開立菜單時查詢、挑選的料理資料庫。
         </p>
       </div>
 
-      <!-- 外部食譜網站推薦快捷專區 -->
-      <div style="margin-bottom: 6px;">
-        <h2>🌐 實用日常料理網站快捷專區</h2>
-      </div>
       <div class="external-links-grid">
         <a href="https://icook.tw/" target="_blank" class="external-link-card">
           <div class="external-link-icon">🍳</div>
           <div class="external-link-info">
             <h3>愛料理 iCook</h3>
-            <p>全台最大料理平台，30萬+食譜</p>
+            <p>全台最大料理平台</p>
           </div>
         </a>
         <a href="https://cookpad.com/tw" target="_blank" class="external-link-card">
           <div class="external-link-icon">🥗</div>
           <div class="external-link-info">
             <h3>Cookpad</h3>
-            <p>全球家庭主廚的家常菜社群</p>
+            <p>全球家庭主廚家常菜社群</p>
           </div>
         </a>
       </div>
@@ -606,7 +554,6 @@
         <input type="text" id="recipe-search" placeholder="輸入料理關鍵字搜尋靈感..." />
       </div>
 
-      <!-- 快速分類篩選 -->
       <div class="filter-tags" id="filter-tags">
         <button class="filter-tag active" data-category="全部">全部顯示</button>
         <button class="filter-tag" data-category="主菜">🥩 葷素主菜</button>
@@ -615,7 +562,6 @@
         <button class="filter-tag" data-category="點心">🍎 點心 / 其他</button>
       </div>
 
-      <!-- 質感日常料理精選展示牆 -->
       <div style="margin-bottom: 8px;">
         <h2>🌟 日常料理精選展示牆</h2>
       </div>
@@ -624,7 +570,7 @@
       <div class="form-container">
         <h2 id="recipe-form-title">✨ 新增參考料理</h2>
         <form id="recipe-add-form">
-          <label>料理名稱：<input type="text" id="recipe-name" required placeholder="例如：三杯雞、清炒高麗菜" /></label>
+          <label>料理名稱：<input type="text" id="recipe-name" required placeholder="例如：三杯雞" /></label>
           <label>料理分類：
             <select id="recipe-category">
               <option value="主菜">主菜 / 葷食</option>
@@ -633,8 +579,8 @@
               <option value="點心">點心 / 水果 / 其他</option>
             </select>
           </label>
-          <label>建議備料：<input type="text" id="recipe-ingredients" required placeholder="例如：雞肉、九層塔、蒜頭、醬油" /></label>
-          <label>烹調備註 / 口味方向：<textarea id="recipe-steps" rows="3" placeholder="例如：適合當作週三主菜，香氣濃郁下飯"></textarea></label>
+          <label>建議備料：<input type="text" id="recipe-ingredients" required placeholder="例如：雞肉、九層塔" /></label>
+          <label>烹調備註 / 口味方向：<textarea id="recipe-steps" rows="3" placeholder="例如：適合當作週三主菜"></textarea></label>
           <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button type="submit" id="recipe-submit-btn" style="flex: 2;">確認新增參考料理</button>
             <button type="button" id="recipe-cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
@@ -666,18 +612,19 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // 登入介面元素
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
     const googleLoginBtn = document.getElementById('google-login-btn');
     const loginError = document.getElementById('login-error');
     const logoutBtn = document.getElementById('logout-btn');
+    const userEmailDisplay = document.getElementById('user-email-display');
 
-    // 監聽登入狀態
+    // 監聽登入狀態並將登入的 Email 顯示於畫面右上角
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authContainer.style.display = 'none';
         appContainer.style.display = 'block';
+        userEmailDisplay.textContent = user.email || user.displayName || "已登入使用者";
         initApp();
       } else {
         authContainer.style.display = 'block';
@@ -685,7 +632,6 @@
       }
     });
 
-    // 點擊 Google 登入按鈕
     googleLoginBtn.addEventListener('click', async () => {
       loginError.style.display = 'none';
       try {
@@ -697,7 +643,6 @@
       }
     });
 
-    // 處理登出
     logoutBtn.addEventListener('click', async () => {
       try {
         await signOut(auth);
@@ -706,7 +651,6 @@
       }
     });
 
-    // 主程式初始化函數
     function initApp() {
       const tabInventoryBtn = document.getElementById('tab-inventory-btn');
       const tabRecipeBtn = document.getElementById('tab-recipe-btn');
@@ -738,7 +682,6 @@
         locations.forEach(loc => {
           const section = document.createElement('div');
           section.className = 'section';
-          
           let titleName = "";
           let icon = "❄️";
           if (loc.includes("fridge")) {
@@ -751,7 +694,6 @@
             titleName = `水果儲放區`;
             icon = "🍎";
           }
-
           section.innerHTML = `<h2>${icon} ${titleName}</h2><ul id="${loc}-list"></ul>`;
           sectionsDiv.appendChild(section);
           sectionElements[loc] = section.querySelector('ul');
@@ -834,7 +776,6 @@
             formTitle.textContent = "✏️ 編輯食材";
             submitBtn.textContent = "確認更新";
             cancelEditBtn.style.display = "block";
-            
             document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
           };
 
@@ -853,8 +794,6 @@
 
           if (sectionElements[loc]) {
             sectionElements[loc].appendChild(li);
-          } else {
-            sectionElements["fridge-1"].appendChild(li);
           }
         });
       }
@@ -926,7 +865,7 @@
         if (!Array.isArray(recipes) || recipes.length === 0) {
           recipeShowcaseContainer.innerHTML = `
             <div style="grid-column: 1 / -1; background: #fff; padding: 24px; border-radius: 12px; text-align: center; color: var(--text-sub); border: 1px solid var(--border-color);">
-              沒有找到符合條件的料理靈感，請試著切換分類或透過下方表單新增新的參考菜色！
+              沒有找到符合條件的料理靈感！
             </div>`;
           return;
         }
@@ -967,7 +906,6 @@
             recipeFormTitle.textContent = "✏️ 編輯參考料理";
             recipeSubmitBtn.textContent = "確認更新料理";
             recipeCancelEditBtn.style.display = "block";
-
             recipeAddForm.scrollIntoView({ behavior: 'smooth' });
           };
 
