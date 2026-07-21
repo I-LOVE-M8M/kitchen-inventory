@@ -275,6 +275,17 @@
       color: var(--text-sub);
     }
 
+    .creator-tag {
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+      width: fit-content;
+      margin-top: 2px;
+    }
+
     .external-links-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -367,7 +378,7 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       flex-grow: 1;
     }
 
@@ -449,7 +460,7 @@
     button.secondary { background-color: #64748b; }
     button.danger { background-color: #fee2e2; color: var(--danger); padding: 6px 12px; font-size: 0.85rem; }
     button.edit-btn { background-color: #f1f5f9; color: var(--text-main); padding: 6px 12px; font-size: 0.85rem; }
-    .actions { display: flex; gap: 6px; }
+    .actions { display: flex; gap: 6px; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -619,12 +630,14 @@
     const logoutBtn = document.getElementById('logout-btn');
     const userEmailDisplay = document.getElementById('user-email-display');
 
-    // 監聽登入狀態並將登入的 Email 顯示於畫面右上角
+    let currentUserEmail = "";
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authContainer.style.display = 'none';
         appContainer.style.display = 'block';
-        userEmailDisplay.textContent = user.email || user.displayName || "已登入使用者";
+        currentUserEmail = user.email || user.displayName || "未知使用者";
+        userEmailDisplay.textContent = currentUserEmail;
         initApp();
       } else {
         authContainer.style.display = 'block';
@@ -750,6 +763,8 @@
             }
           }
 
+          const creatorText = item.createdBy ? `新增者：${item.createdBy}` : `新增者：未知`;
+
           li.innerHTML = `
             <div class="item-info">
               <div class="item-header-row">
@@ -757,6 +772,7 @@
                 ${badgeHtml}
               </div>
               <span class="item-detail">數量：${item.amount || "未填"} &nbsp;|&nbsp; 期限：${expiryText}</span>
+              <span class="creator-tag">👤 ${creatorText}</span>
             </div>
           `;
 
@@ -836,7 +852,12 @@
             });
           } else {
             await addDoc(collection(db, "ingredients"), {
-              name, amount, expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, location, createdAt: new Date()
+              name, 
+              amount, 
+              expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, 
+              location, 
+              createdBy: currentUserEmail, // 自動記錄當前登入的使用者
+              createdAt: new Date()
             });
           }
           resetForm();
@@ -875,6 +896,8 @@
           const card = document.createElement('div');
           card.className = 'recipe-showcase-card';
 
+          const creatorText = recipe.createdBy ? `新增者：${recipe.createdBy}` : `新增者：未知`;
+
           card.innerHTML = `
             <div class="recipe-card-banner ${catClass}">
               <div class="recipe-card-title">
@@ -887,6 +910,7 @@
                 <span>🛒 <strong>建議備料：</strong>${recipe.ingredients || '未填寫'}</span>
               </div>
               ${recipe.steps ? `<div class="recipe-steps-box">💡 <strong>烹調筆記：</strong><br>${recipe.steps}</div>` : ''}
+              <span class="creator-tag">👤 ${creatorText}</span>
             </div>
             <div class="recipe-card-footer"></div>
           `;
@@ -979,7 +1003,12 @@
             });
           } else {
             await addDoc(collection(db, "recipes"), {
-              name, category, ingredients, steps, createdAt: new Date()
+              name, 
+              category, 
+              ingredients, 
+              steps, 
+              createdBy: currentUserEmail, // 自動記錄當前登入的使用者
+              createdAt: new Date()
             });
           }
           resetRecipeForm();
