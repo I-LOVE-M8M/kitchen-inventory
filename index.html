@@ -6,10 +6,10 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     h1 { color: #2c3e50; }
-    .container { display: flex; gap: 20px; }
-    .section { border: 1px solid #ccc; padding: 10px; width: 300px; }
+    .container { display: flex; flex-wrap: wrap; gap: 20px; }
+    .section { border: 1px solid #ccc; padding: 10px; width: 250px; }
     .item { margin: 5px 0; }
-    .item.expiring { color: red; font-weight: bold; } /* 快到期提醒 */
+    .item.expiring { color: red; font-weight: bold; }
     label { display: block; margin-top: 10px; }
     input, select { width: 100%; padding: 5px; }
     button { margin: 5px; padding: 5px 10px; }
@@ -23,16 +23,7 @@
   <!-- 🔍 搜尋框 -->
   <input type="text" id="search" placeholder="輸入食材名稱搜尋...">
 
-  <div class="container">
-    <div class="section">
-      <h2>冰箱</h2>
-      <ul id="fridge-list"></ul>
-    </div>
-    <div class="section">
-      <h2>乾末庫</h2>
-      <ul id="storage-list"></ul>
-    </div>
-  </div>
+  <div class="container" id="sections"></div>
 
   <h2>新增食材</h2>
   <form id="add-form">
@@ -41,8 +32,13 @@
     <label>保存期限：<input type="date" id="expiry" required></label>
     <label>位置：
       <select id="location">
-        <option value="fridge">冰箱</option>
-        <option value="storage">乾末庫</option>
+        <option value="fridge-1">冰箱1</option>
+        <option value="fridge-2">冰箱2</option>
+        <option value="fridge-3">冰箱3</option>
+        <option value="fridge-4">冰箱4</option>
+        <option value="fridge-5">冰箱5</option>
+        <option value="storage-1">糧秣庫1</option>
+        <option value="storage-2">糧秣庫2</option>
       </select>
     </label>
     <button type="submit">新增</button>
@@ -66,17 +62,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const fridgeList = document.getElementById('fridge-list');
-    const storageList = document.getElementById('storage-list');
+    const sectionsDiv = document.getElementById('sections');
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
 
     let editingId = null;
-    let allItems = []; // 🔍 全部食材暫存，用於搜尋
+    let allItems = [];
+
+    // 建立區域 DOM
+    const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
+    const sectionElements = {};
+    locations.forEach(loc => {
+      const section = document.createElement('div');
+      section.className = 'section';
+      section.innerHTML = `<h2>${loc.includes("fridge") ? "冰箱" : "糧秣庫"} ${loc.split("-")[1]}</h2><ul id="${loc}-list"></ul>`;
+      sectionsDiv.appendChild(section);
+      sectionElements[loc] = section.querySelector('ul');
+    });
 
     function renderList(items) {
-      fridgeList.innerHTML = "";
-      storageList.innerHTML = "";
+      // 清空所有區域
+      locations.forEach(loc => sectionElements[loc].innerHTML = "");
 
       items.forEach((item) => {
         const li = document.createElement('li');
@@ -87,9 +93,7 @@
 
         const today = new Date();
         const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        if (diffDays <= 3) {
-          li.classList.add("expiring");
-        }
+        if (diffDays <= 3) li.classList.add("expiring");
 
         const actions = document.createElement('span');
         actions.className = 'actions';
@@ -114,11 +118,7 @@
         actions.appendChild(delBtn);
         li.appendChild(actions);
 
-        if (item.location === 'fridge') {
-          fridgeList.appendChild(li);
-        } else {
-          storageList.appendChild(li);
-        }
+        sectionElements[item.location].appendChild(li);
       });
     }
 
@@ -128,7 +128,7 @@
         allItems.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // ✅ 排序：依保存期限由近到遠
+      // 排序：依保存期限由近到遠
       allItems.sort((a, b) => {
         const dateA = a.expiry.toDate ? a.expiry.toDate() : new Date(a.expiry);
         const dateB = b.expiry.toDate ? b.expiry.toDate() : new Date(b.expiry);
@@ -138,7 +138,7 @@
       renderList(allItems);
     });
 
-    // 🔍 搜尋功能
+    // 搜尋功能
     searchInput.addEventListener('input', () => {
       const keyword = searchInput.value.toLowerCase();
       const filtered = allItems.filter(item => item.name.toLowerCase().includes(keyword));
