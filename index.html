@@ -60,7 +60,6 @@
       margin: 0;
     }
 
-    /* 固定使用手機友好的卡片設計 */
     .item {
       background: #fff;
       border: 1px solid #ddd;
@@ -200,6 +199,7 @@
           <option value="fridge-5">冰箱5</option>
           <option value="storage-1">糧秣庫1</option>
           <option value="storage-2">糧秣庫2</option>
+          <option value="pantry">水果儲放區</option>
         </select>
       </label>
       <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -238,7 +238,7 @@
     let editingId = null;
     let allItems = [];
 
-    const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
+    const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2","pantry"];
     const sectionElements = {};
 
     if (!sectionsDiv) {
@@ -247,7 +247,18 @@
       locations.forEach(loc => {
         const section = document.createElement('div');
         section.className = 'section';
-        section.innerHTML = `<h2>${loc.includes("fridge") ? "冰箱" : "糧秣庫"} ${loc.split("-")[1]}</h2><ul id="${loc}-list"></ul>`;
+        
+        // 標題顯示判斷
+        let titleName = "";
+        if (loc.includes("fridge")) {
+          titleName = `冰箱 ${loc.split("-")[1]}`;
+        } else if (loc.includes("storage")) {
+          titleName = `糧秣庫 ${loc.split("-")[1]}`;
+        } else if (loc === "pantry") {
+          titleName = `水果儲放區`;
+        }
+
+        section.innerHTML = `<h2>${titleName}</h2><ul id="${loc}-list"></ul>`;
         sectionsDiv.appendChild(section);
         sectionElements[loc] = section.querySelector('ul');
       });
