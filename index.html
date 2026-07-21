@@ -471,7 +471,7 @@
     // --- 全域資料暫存 ---
     let allItems = [];
     let allRecipes = [];
-    let currentCategoryFilter = "للكل" || "全部";
+    let currentCategoryFilter = "全部"; // 修正此處的預設篩選值
 
     // --- 庫存管理相關邏輯 ---
     const sectionsDiv = document.getElementById('sections');
@@ -782,7 +782,7 @@
           });
           editingRecipeId = null;
         } else {
-          await addDoc(collection(db, "recipes"), {
+          addDoc(collection(db, "recipes"), {
             name, category, ingredients, steps, createdAt: new Date()
           });
         }
