@@ -60,37 +60,43 @@
       margin: 0;
     }
 
+    /* 固定使用手機友好的卡片設計 */
     .item {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .item:last-child {
-      border-bottom: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
     }
 
     .item.expiring {
-      color: var(--danger);
-      font-weight: bold;
+      border-color: var(--danger);
     }
 
     .item-info {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      width: 100%;
     }
 
     .item-name {
       font-size: 1rem;
       font-weight: 600;
+      color: var(--primary);
     }
 
     .item-detail {
       font-size: 0.85rem;
       color: #666;
+    }
+
+    .item.expiring .item-name {
+      color: var(--danger);
     }
 
     .item.expiring .item-detail {
@@ -143,35 +149,14 @@
     .actions {
       display: flex;
       gap: 6px;
+      width: 100%;
+      justify-content: flex-end;
     }
 
     #search {
       margin: 0 0 16px 0;
       width: 100%;
       font-size: 16px;
-    }
-
-    .controls-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    /* 卡片模式 (全面升級手機友善卡片) */
-    .card-mode .item {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .card-mode .actions {
-      width: 100%;
-      justify-content: flex-end;
     }
 
     #add-form-container {
@@ -197,10 +182,6 @@
   <h1>廚房食材管理系統</h1>
 
   <input type="text" id="search" placeholder="🔍 輸入食材名稱搜尋..." />
-  
-  <div class="controls-bar">
-    <button id="toggleMode" class="secondary" style="flex:1;">切換卡片/清單模式</button>
-  </div>
 
   <div class="container" id="sections"></div>
 
@@ -250,14 +231,12 @@
     const sectionsDiv = document.getElementById('sections');
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
-    const toggleBtn = document.getElementById('toggleMode');
     const formTitle = document.getElementById('form-title');
     const submitBtn = document.getElementById('submit-btn');
     const cancelEditBtn = document.getElementById('cancel-edit');
 
     let editingId = null;
     let allItems = [];
-    let cardMode = true; // 手機優先，預設開啟卡片模式
 
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
@@ -310,7 +289,6 @@
 
         if (isExpiring) li.classList.add("expiring");
 
-        // 結構化資訊顯示
         li.innerHTML = `
           <div class="item-info">
             <span class="item-name">${item.name}</span>
@@ -336,7 +314,6 @@
           submitBtn.textContent = "更新";
           cancelEditBtn.style.display = "block";
           
-          // 自動滾動到表單位置方便修改
           document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
         };
 
@@ -363,15 +340,8 @@
           sectionElements["fridge-1"].appendChild(li);
         }
       });
-
-      if (cardMode) {
-        sectionsDiv.classList.add("card-mode");
-      } else {
-        sectionsDiv.classList.remove("card-mode");
-      }
     }
 
-    // 取消編輯按鈕事件
     cancelEditBtn.addEventListener('click', () => {
       resetForm();
     });
@@ -405,11 +375,6 @@
       const keyword = searchInput.value.toLowerCase();
       const filtered = allItems.filter(item => (item.name || "").toLowerCase().includes(keyword));
       renderList(filtered);
-    });
-
-    toggleBtn.addEventListener('click', () => {
-      cardMode = !cardMode;
-      renderList(allItems);
     });
 
     form.addEventListener('submit', async function(e) {
