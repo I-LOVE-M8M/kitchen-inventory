@@ -1008,21 +1008,22 @@
       });
 
       recipeSearchInput.oninput = () => filterAndRenderRecipes();
-      recipeCancelEditBtn.onclick = () => resetRecipeForm();
-
-      function resetRecipeForm() {
-        recipeAddForm.reset();
-        editingRecipeId = null;
-        recipeFormTitle.textContent = "✨ 新裝參考料理";
-        recipeSubmitBtn.textContent = "確認新增參考料理";
-        recipeCancelEditBtn.style.display = "none";
-      }
 
       onSnapshot(collection(db, "recipes"), (snapshot) => {
         allRecipes = [];
         snapshot.forEach((docSnap) => allRecipes.push({ id: docSnap.id, ...docSnap.data() }));
         filterAndRenderRecipes();
       });
+
+      recipeCancelEditBtn.onclick = () => resetRecipeForm();
+
+      function resetRecipeForm() {
+        recipeAddForm.reset();
+        editingRecipeId = null;
+        recipeFormTitle.textContent = "✨ 新增參考料理";
+        recipeSubmitBtn.textContent = "確認新增參考料理";
+        recipeCancelEditBtn.style.display = "none";
+      }
 
       recipeAddForm.onsubmit = async function(e) {
         e.preventDefault();
@@ -1038,9 +1039,8 @@
             await updateDoc(doc(db, "recipes", editingRecipeId), {
               name, category, ingredients, steps, updatedAt: new Date()
             });
-            editingRecipeId = null;
           } else {
-            addDoc(collection(db, "recipes"), {
+            await addDoc(collection(db, "recipes"), {
               name, category, ingredients, steps, createdAt: new Date()
             });
           }
