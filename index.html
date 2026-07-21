@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>廚房食材管理系統</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
@@ -11,11 +11,12 @@
     .item { margin: 5px 0; }
     .item.expiring { color: red; font-weight: bold; }
     label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 5px; }
+    input, select { width: 100%; padding: 5px; box-sizing: border-box; }
     button { margin: 5px; padding: 5px 10px; }
     .actions { margin-left: 10px; }
-    #search { margin: 15px 0; padding: 5px; width: 300px; }
+    #search { margin: 15px 0; padding: 5px; width: 300px; box-sizing: border-box; }
 
+    /* 卡片模式 */
     .card-mode .item {
       border: 1px solid #aaa;
       padding: 10px;
@@ -24,6 +25,7 @@
       background: #f9f9f9;
     }
 
+    /* 手機版調整 */
     @media (max-width: 600px) {
       .section { flex: 1 1 100%; max-width: 100%; }
       #search { width: 100%; }
@@ -35,16 +37,16 @@
 <body>
   <h1>廚房食材管理系統</h1>
 
-  <input type="text" id="search" placeholder="輸入食材名稱搜尋...">
+  <input type="text" id="search" placeholder="輸入食材名稱搜尋..." />
   <button id="toggleMode">切換顯示模式</button>
 
   <div class="container" id="sections"></div>
 
   <h2>新增食材</h2>
   <form id="add-form">
-    <label>食材名稱：<input type="text" id="name" required></label>
-    <label>重量/數量：<input type="text" id="amount" required></label>
-    <label>保存期限：<input type="date" id="expiry" required></label>
+    <label>食材名稱：<input type="text" id="name" required /></label>
+    <label>重量/數量：<input type="text" id="amount" required /></label>
+    <label>保存期限：<input type="date" id="expiry" required /></label>
     <label>位置：
       <select id="location">
         <option value="fridge-1">冰箱1</option>
@@ -77,6 +79,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // DOM 元素
     const sectionsDiv = document.getElementById('sections');
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
@@ -86,31 +89,74 @@
     let allItems = [];
     let cardMode = false;
 
+    // 定義位置並建立區塊
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
-    locations.forEach(loc => {
-      const section = document.createElement('div');
-      section.className = 'section';
-      section.innerHTML = `<h2>${loc.includes("fridge") ? "冰箱" : "糧秣庫"} ${loc.split("-")[1]}</h2><ul id="${loc}-list"></ul>`;
-      sectionsDiv.appendChild(section);
-      sectionElements[loc] = section.querySelector('ul');
-    });
+
+    // 防呆：確保 sectionsDiv 存在
+    if (!sectionsDiv) {
+      console.error("找不到 #sections 容器，請確認 HTML 有 <div id='sections'></div>");
+    } else {
+      locations.forEach(loc => {
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.innerHTML = `<h2>${loc.includes("fridge") ? "冰箱" : "糧秣庫"} ${loc.split("-")[1]}</h2><ul id="${loc}-list"></ul>`;
+        sectionsDiv.appendChild(section);
+        sectionElements[loc] = section.querySelector('ul');
+      });
+      console.log("已建立的區塊 keys:", Object.keys(sectionElements));
+    }
+
+    // 轉換 expiry 到 Date 的 helper
+    function toDate(value) {
+      if (!value) return null;
+      // Firestore Timestamp
+      if (typeof value === 'object' && typeof value.toDate === 'function') {
+        return value.toDate();
+      }
+      // ISO 字串或其他可解析格式
+      const d = new Date(value);
+      if (!isNaN(d)) return d;
+      return null;
+    }
 
     function renderList(items) {
-      locations.forEach(loc => sectionElements[loc].innerHTML = "");
+      // 清空所有區域（防呆）
+      locations.forEach(loc => {
+        if (sectionElements[loc]) sectionElements[loc].innerHTML = "";
+      });
+
+      // 如果 items 不是陣列，直接返回
+      if (!Array.isArray(items)) {
+        console.warn("renderList 收到非陣列 items:", items);
+        return;
+      }
 
       items.forEach((item) => {
-        console.log("顯示位置:", item.location, "是否存在:", !!sectionElements[item.location]);
+        // 防呆：確保 item 有 id 與 name
+        if (!item || !item.name) {
+          console.warn("跳過不完整的 item:", item);
+          return;
+        }
+
+        // 預設 location（若文件沒有 location）
+        const loc = item.location || "fridge-1";
+
+        // debug log：顯示 location 與是否有對應區塊
+        console.log("顯示位置:", loc, "是否存在:", !!sectionElements[loc], "docId:", item.id);
 
         const li = document.createElement('li');
         li.className = 'item';
 
-        const expiryDate = item.expiry.toDate ? item.expiry.toDate() : new Date(item.expiry);
-        li.textContent = `${item.name} - ${item.amount} (期限: ${expiryDate.toISOString().split("T")[0]})`;
+        const expiryDate = toDate(item.expiry);
+        const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
+        li.textContent = `${item.name} - ${item.amount || ""} (期限: ${expiryText})`;
 
         const today = new Date();
-        const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        if (diffDays <= 3) li.classList.add("expiring");
+        if (expiryDate) {
+          const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+          if (diffDays <= 3) li.classList.add("expiring");
+        }
 
         const actions = document.createElement('span');
         actions.className = 'actions';
@@ -119,29 +165,41 @@
         editBtn.textContent = "編輯";
         editBtn.onclick = () => {
           document.getElementById('name').value = item.name;
-          document.getElementById('amount').value = item.amount;
-          document.getElementById('expiry').value = expiryDate.toISOString().split("T")[0];
-          document.getElementById('location').value = item.location;
+          document.getElementById('amount').value = item.amount || "";
+          if (expiryDate) {
+            document.getElementById('expiry').value = expiryDate.toISOString().split("T")[0];
+          } else {
+            document.getElementById('expiry').value = "";
+          }
+          document.getElementById('location').value = loc;
           editingId = item.id;
         };
 
         const delBtn = document.createElement('button');
         delBtn.textContent = "刪除";
         delBtn.onclick = async () => {
-          await deleteDoc(doc(db, "ingredients", item.id));
+          try {
+            await deleteDoc(doc(db, "ingredients", item.id));
+            console.log("已刪除:", item.id);
+          } catch (err) {
+            console.error("刪除失敗:", err);
+          }
         };
 
         actions.appendChild(editBtn);
         actions.appendChild(delBtn);
         li.appendChild(actions);
 
-        if (sectionElements[item.location]) {
-          sectionElements[item.location].appendChild(li);
+        // 防呆 append：若找不到對應區塊，放到第一個區塊並在 console 警告
+        if (sectionElements[loc]) {
+          sectionElements[loc].appendChild(li);
         } else {
-          console.warn("⚠️ 找不到區塊:", item.location);
+          console.warn("找不到區塊:", loc, "將放到 fridge-1 作為 fallback。 docId:", item.id);
+          sectionElements["fridge-1"].appendChild(li);
         }
       });
 
+      // 切換卡片樣式
       if (cardMode) {
         sectionsDiv.classList.add("card-mode");
       } else {
@@ -149,55 +207,80 @@
       }
     }
 
+    // 監聽 Firestore 資料
     onSnapshot(collection(db, "ingredients"), (snapshot) => {
       allItems = [];
       snapshot.forEach((docSnap) => {
         allItems.push({ id: docSnap.id, ...docSnap.data() });
       });
 
+      // 排序（依 expiry）
       allItems.sort((a, b) => {
-        const dateA = a.expiry.toDate ? a.expiry.toDate() : new Date(a.expiry);
-        const dateB = b.expiry.toDate ? b.expiry.toDate() : new Date(b.expiry);
+        const dateA = toDate(a.expiry) || new Date(8640000000000000); // 無期限放最後
+        const dateB = toDate(b.expiry) || new Date(8640000000000000);
         return dateA - dateB;
       });
 
+      console.log("從 Firestore 取得資料筆數:", allItems.length);
       renderList(allItems);
+    }, (err) => {
+      console.error("onSnapshot 錯誤:", err);
     });
 
+    // 搜尋
     searchInput.addEventListener('input', () => {
       const keyword = searchInput.value.toLowerCase();
-      const filtered = allItems.filter(item => item.name.toLowerCase().includes(keyword));
+      const filtered = allItems.filter(item => (item.name || "").toLowerCase().includes(keyword));
       renderList(filtered);
     });
 
+    // 切換顯示模式
     toggleBtn.addEventListener('click', () => {
       cardMode = !cardMode;
       renderList(allItems);
     });
 
+    // 新增 / 更新
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const name = document.getElementById('name').value;
-      const amount = document.getElementById('amount').value;
-      const expiry = document.getElementById('expiry').value;
+      const name = document.getElementById('name').value.trim();
+      const amount = document.getElementById('amount').value.trim();
+      const expiryVal = document.getElementById('expiry').value;
       const location = document.getElementById('location').value;
 
-      if (editingId) {
-        await updateDoc(doc(db, "ingredients", editingId), {
-          name,
-          amount,
-          expiry: Timestamp.fromDate(new Date(expiry)),
-          location,
-          updatedAt: new Date()
-        });
-        editingId = null;
-      } else {
-        await addDoc(collection(db, "ingredients"), {
-          name,
-          amount,
-          expiry: Timestamp.fromDate(new Date(expiry)),
-          location,
-          createdAt: new Date()
-        });
+      if (!name) {
+        alert("請輸入食材名稱");
+        return;
       }
 
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, "ingredients", editingId), {
+            name,
+            amount,
+            expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null,
+            location,
+            updatedAt: new Date()
+          });
+          console.log("已更新:", editingId);
+          editingId = null;
+        } else {
+          const docRef = await addDoc(collection(db, "ingredients"), {
+            name,
+            amount,
+            expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null,
+            location,
+            createdAt: new Date()
+          });
+          console.log("已新增 docId:", docRef.id, "location:", location);
+        }
+      } catch (err) {
+        console.error("寫入 Firestore 失敗:", err);
+        alert("儲存失敗，請查看 console 錯誤訊息");
+      }
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
