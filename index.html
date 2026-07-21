@@ -14,10 +14,14 @@
     input, select { width: 100%; padding: 5px; }
     button { margin: 5px; padding: 5px 10px; }
     .actions { margin-left: 10px; }
+    #search { margin: 15px 0; padding: 5px; width: 300px; }
   </style>
 </head>
 <body>
   <h1>廚房食材管理系統</h1>
+
+  <!-- 🔍 搜尋框 -->
+  <input type="text" id="search" placeholder="輸入食材名稱搜尋...">
 
   <div class="container">
     <div class="section">
@@ -65,8 +69,10 @@
     const fridgeList = document.getElementById('fridge-list');
     const storageList = document.getElementById('storage-list');
     const form = document.getElementById('add-form');
+    const searchInput = document.getElementById('search');
 
     let editingId = null;
+    let allItems = []; // 🔍 全部食材暫存，用於搜尋
 
     function renderList(items) {
       fridgeList.innerHTML = "";
@@ -76,11 +82,9 @@
         const li = document.createElement('li');
         li.className = 'item';
 
-        // 轉換 Firestore Timestamp 或字串
         const expiryDate = item.expiry.toDate ? item.expiry.toDate() : new Date(item.expiry);
         li.textContent = `${item.name} - ${item.amount} (期限: ${expiryDate.toISOString().split("T")[0]})`;
 
-        // 🔴 快到期提醒：剩 3 天以內顯示紅色
         const today = new Date();
         const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
         if (diffDays <= 3) {
@@ -119,19 +123,26 @@
     }
 
     onSnapshot(collection(db, "ingredients"), (snapshot) => {
-      let items = [];
+      allItems = [];
       snapshot.forEach((docSnap) => {
-        items.push({ id: docSnap.id, ...docSnap.data() });
+        allItems.push({ id: docSnap.id, ...docSnap.data() });
       });
 
       // ✅ 排序：依保存期限由近到遠
-      items.sort((a, b) => {
+      allItems.sort((a, b) => {
         const dateA = a.expiry.toDate ? a.expiry.toDate() : new Date(a.expiry);
         const dateB = b.expiry.toDate ? b.expiry.toDate() : new Date(b.expiry);
         return dateA - dateB;
       });
 
-      renderList(items);
+      renderList(allItems);
+    });
+
+    // 🔍 搜尋功能
+    searchInput.addEventListener('input', () => {
+      const keyword = searchInput.value.toLowerCase();
+      const filtered = allItems.filter(item => item.name.toLowerCase().includes(keyword));
+      renderList(filtered);
     });
 
     form.addEventListener('submit', async function(e) {
@@ -145,7 +156,7 @@
         await updateDoc(doc(db, "ingredients", editingId), {
           name,
           amount,
-          expiry: Timestamp.fromDate(new Date(expiry)), // ✅ 改成 Timestamp
+          expiry: Timestamp.fromDate(new Date(expiry)),
           location,
           updatedAt: new Date()
         });
@@ -154,7 +165,7 @@
         await addDoc(collection(db, "ingredients"), {
           name,
           amount,
-          expiry: Timestamp.fromDate(new Date(expiry)), // ✅ 改成 Timestamp
+          expiry: Timestamp.fromDate(new Date(expiry)),
           location,
           createdAt: new Date()
         });
