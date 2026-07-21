@@ -9,6 +9,7 @@
     .container { display: flex; gap: 20px; }
     .section { border: 1px solid #ccc; padding: 10px; width: 300px; }
     .item { margin: 5px 0; }
+    .item.expiring { color: red; font-weight: bold; } /* 快到期提醒 */
     label { display: block; margin-top: 10px; }
     input, select { width: 100%; padding: 5px; }
     button { margin: 5px; padding: 5px 10px; }
@@ -48,7 +49,6 @@
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 你的 Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyDOzYayn2PmFJGLEqQ2S7Sy_ullVVg1ae8",
       authDomain: "kitchen-c242c.firebaseapp.com",
@@ -59,7 +59,6 @@
       measurementId: "G-S8LG9J01CX"
     };
 
-    // 初始化 Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -67,7 +66,8 @@
     const storageList = document.getElementById('storage-list');
     const form = document.getElementById('add-form');
 
-    // 渲染清單
+    let editingId = null;
+
     function renderList(items) {
       fridgeList.innerHTML = "";
       storageList.innerHTML = "";
@@ -77,18 +77,25 @@
         li.className = 'item';
         li.textContent = `${item.name} - ${item.amount} (期限: ${item.expiry})`;
 
-        // 建立操作按鈕
+        // 🔴 快到期提醒：剩 3 天以內顯示紅色
+        const today = new Date();
+        const expiryDate = new Date(item.expiry);
+        const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 3) {
+          li.classList.add("expiring");
+        }
+
         const actions = document.createElement('span');
         actions.className = 'actions';
 
         const editBtn = document.createElement('button');
         editBtn.textContent = "編輯";
-        editBtn.onclick = async () => {
+        editBtn.onclick = () => {
           document.getElementById('name').value = item.name;
           document.getElementById('amount').value = item.amount;
           document.getElementById('expiry').value = item.expiry;
           document.getElementById('location').value = item.location;
-          await deleteDoc(doc(db, "ingredients", item.id)); // 先刪除，修改後再新增
+          editingId = item.id;
         };
 
         const delBtn = document.createElement('button');
@@ -109,7 +116,6 @@
       });
     }
 
-    // 監聽 Firestore 即時更新
     onSnapshot(collection(db, "ingredients"), (snapshot) => {
       const items = [];
       snapshot.forEach((docSnap) => {
@@ -118,7 +124,6 @@
       renderList(items);
     });
 
-    // 新增食材
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value;
@@ -126,13 +131,24 @@
       const expiry = document.getElementById('expiry').value;
       const location = document.getElementById('location').value;
 
-      await addDoc(collection(db, "ingredients"), {
-        name,
-        amount,
-        expiry,
-        location,
-        createdAt: new Date()
-      });
+      if (editingId) {
+        await updateDoc(doc(db, "ingredients", editingId), {
+          name,
+          amount,
+          expiry,
+          location,
+          updatedAt: new Date()
+        });
+        editingId = null;
+      } else {
+        await addDoc(collection(db, "ingredients"), {
+          name,
+          amount,
+          expiry,
+          location,
+          createdAt: new Date()
+        });
+      }
 
       form.reset();
     });
