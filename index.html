@@ -16,7 +16,6 @@
     .actions { margin-left: 10px; }
     #search { margin: 15px 0; padding: 5px; width: 300px; }
 
-    /* 卡片模式 */
     .card-mode .item {
       border: 1px solid #aaa;
       padding: 10px;
@@ -25,7 +24,6 @@
       background: #f9f9f9;
     }
 
-    /* 手機版調整 */
     @media (max-width: 600px) {
       .section { flex: 1 1 100%; max-width: 100%; }
       #search { width: 100%; }
@@ -37,10 +35,7 @@
 <body>
   <h1>廚房食材管理系統</h1>
 
-  <!-- 🔍 搜尋框 -->
   <input type="text" id="search" placeholder="輸入食材名稱搜尋...">
-
-  <!-- 🔘 顯示模式切換 -->
   <button id="toggleMode">切換顯示模式</button>
 
   <div class="container" id="sections"></div>
@@ -91,7 +86,6 @@
     let allItems = [];
     let cardMode = false;
 
-    // ✅ 建立所有冰箱/糧秣庫區域 DOM
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
     locations.forEach(loc => {
@@ -106,6 +100,8 @@
       locations.forEach(loc => sectionElements[loc].innerHTML = "");
 
       items.forEach((item) => {
+        console.log("顯示位置:", item.location, "是否存在:", !!sectionElements[item.location]);
+
         const li = document.createElement('li');
         li.className = 'item';
 
@@ -139,7 +135,11 @@
         actions.appendChild(delBtn);
         li.appendChild(actions);
 
-        sectionElements[item.location].appendChild(li);
+        if (sectionElements[item.location]) {
+          sectionElements[item.location].appendChild(li);
+        } else {
+          console.warn("⚠️ 找不到區塊:", item.location);
+        }
       });
 
       if (cardMode) {
@@ -201,8 +201,3 @@
         });
       }
 
-      form.reset();
-    });
-  </script>
-</body>
-</html>
