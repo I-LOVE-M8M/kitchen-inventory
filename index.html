@@ -60,6 +60,52 @@
       gap: 6px;
     }
 
+    /* 登入畫面樣式 */
+    #auth-container {
+      max-width: 400px;
+      margin: 100px auto;
+      background: var(--card-bg);
+      padding: 40px 30px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    #app-container {
+      display: none; /* 預設隱藏，登入後才顯示 */
+    }
+
+    /* Google 登入按鈕樣式 */
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #ffffff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: background-color 0.2s, box-shadow 0.2s;
+      margin-top: 20px;
+    }
+
+    .google-btn:hover {
+      background-color: #f8f9fa;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+
     /* 分頁切換頁籤 */
     .tabs {
       display: flex;
@@ -226,7 +272,7 @@
       color: var(--text-sub);
     }
 
-    /* ================= 外部食譜網站推薦快捷專區樣式 ================= */
+    /* 外部食譜網站推薦快捷專區樣式 */
     .external-links-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -279,7 +325,7 @@
       color: var(--text-sub);
     }
 
-    /* ================= 質感網頁風：日常料理精選卡片樣式 ================= */
+    /* 質感網頁風：日常料理精選卡片樣式 */
     .web-showcase-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -459,122 +505,142 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>🍳 廚房與每週菜單管理系統</h1>
-  </header>
 
-  <!-- 上方頁籤切換 -->
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-inventory-btn">📦 食材庫存管理</button>
-    <button class="tab-btn" id="tab-recipe-btn">📖 每週開菜單料理參考庫</button>
+  <!-- Google 登入畫面 -->
+  <div id="auth-container">
+    <h2>🍳 廚房管理系統</h2>
+    <p style="font-size: 0.9rem; color: var(--text-sub); margin-top: 8px;">請使用您的 Google 帳號登入系統</p>
+    
+    <button id="google-login-btn" class="google-btn">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.14C3.19 21.35 7.23 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.18C.43 8.12 0 9.8 0 12s.43 3.88 1.18 5.38l4.09-3.14z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.19 2.65 1.18 6.62l4.09 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
+      </svg>
+      使用 Google 帳號登入
+    </button>
+    <div id="login-error" style="color: var(--danger); font-size: 0.85rem; margin-top: 15px; display: none;"></div>
   </div>
 
-  <!-- 分頁 1：庫存管理 -->
-  <div id="tab-inventory" class="tab-content active">
-    <div class="search-wrapper">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search" placeholder="輸入食材名稱快速搜尋..." />
+  <!-- 主系統畫面 (登入後顯示) -->
+  <div id="app-container">
+    <header>
+      <h1>🍳 廚房與每週菜單管理系統</h1>
+      <button id="logout-btn" class="secondary" style="padding: 6px 12px; font-size: 0.85rem;">登出</button>
+    </header>
+
+    <!-- 上方頁籤切換 -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-inventory-btn">📦 食材庫存管理</button>
+      <button class="tab-btn" id="tab-recipe-btn">📖 每週開菜單料理參考庫</button>
     </div>
 
-    <div class="container" id="sections"></div>
+    <!-- 分頁 1：庫存管理 -->
+    <div id="tab-inventory" class="tab-content active">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="輸入食材名稱快速搜尋..." />
+      </div>
 
-    <div class="form-container" id="add-form-container">
-      <h2 id="form-title">✨ 新增食材</h2>
-      <form id="add-form">
-        <label>食材名稱：<input type="text" id="name" required placeholder="例如：高麗菜、雞蛋" /></label>
-        <label>重量/數量：<input type="text" id="amount" required placeholder="例如：1顆 / 500g" /></label>
-        <label>保存期限：<input type="date" id="expiry" required /></label>
-        <label>儲放位置：
-          <select id="location">
-            <option value="fridge-1">冰箱 1</option>
-            <option value="fridge-2">冰箱 2</option>
-            <option value="fridge-3">冰箱 3</option>
-            <option value="fridge-4">冰箱 4</option>
-            <option value="fridge-5">冰箱 5</option>
-            <option value="storage-1">糧秣庫 1</option>
-            <option value="storage-2">糧秣庫 2</option>
-            <option value="pantry">水果儲放區</option>
-          </select>
-        </label>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="submit" id="submit-btn" style="flex: 2;">確認新增</button>
-          <button type="button" id="cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
-        </div>
-      </form>
-    </div>
-  </div>
+      <div class="container" id="sections"></div>
 
-  <!-- 分頁 2：每週開菜單料理參考庫（含外部食譜網站快捷專區） -->
-  <div id="tab-recipe" class="tab-content">
-    <div class="section" style="margin-bottom: 16px; background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border-color: #bfdbfe;">
-      <h2>💡 每週開菜單靈感提示</h2>
-      <p style="margin: 0; font-size: 0.9rem; color: var(--text-sub);">
-        這是一個專門用來在每週提早開立菜單時查詢、挑選的料理資料庫。您可以直接點擊下方外部熱門食譜網站找尋靈感，或透過系統中的精選卡片牆與分類快速過濾您的私房菜！
-      </p>
+      <div class="form-container" id="add-form-container">
+        <h2 id="form-title">✨ 新增食材</h2>
+        <form id="add-form">
+          <label>食材名稱：<input type="text" id="name" required placeholder="例如：高麗菜、雞蛋" /></label>
+          <label>重量/數量：<input type="text" id="amount" required placeholder="例如：1顆 / 500g" /></label>
+          <label>保存期限：<input type="date" id="expiry" required /></label>
+          <label>儲放位置：
+            <select id="location">
+              <option value="fridge-1">冰箱 1</option>
+              <option value="fridge-2">冰箱 2</option>
+              <option value="fridge-3">冰箱 3</option>
+              <option value="fridge-4">冰箱 4</option>
+              <option value="fridge-5">冰箱 5</option>
+              <option value="storage-1">糧秣庫 1</option>
+              <option value="storage-2">糧秣庫 2</option>
+              <option value="pantry">水果儲放區</option>
+            </select>
+          </label>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" id="submit-btn" style="flex: 2;">確認新增</button>
+            <button type="button" id="cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- 外部食譜網站推薦快捷專區 -->
-    <div style="margin-bottom: 6px;">
-      <h2>🌐 實用日常料理網站快捷專區</h2>
-    </div>
-    <div class="external-links-grid">
-      <a href="https://icook.tw/" target="_blank" class="external-link-card">
-        <div class="external-link-icon">🍳</div>
-        <div class="external-link-info">
-          <h3>愛料理 iCook</h3>
-          <p>全台最大料理平台，30萬+食譜</p>
-        </div>
-      </a>
-      <a href="https://cookpad.com/tw" target="_blank" class="external-link-card">
-        <div class="external-link-icon">🥗</div>
-        <div class="external-link-info">
-          <h3>Cookpad</h3>
-          <p>全球家庭主廚的家常菜社群</p>
-        </div>
-      </a>
-    </div>
+    <!-- 分頁 2：每週開菜單料理參考庫 -->
+    <div id="tab-recipe" class="tab-content">
+      <div class="section" style="margin-bottom: 16px; background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border-color: #bfdbfe;">
+        <h2>💡 每週開菜單靈感提示</h2>
+        <p style="margin: 0; font-size: 0.9rem; color: var(--text-sub);">
+          這是一個專門用來在每週提早開立菜單時查詢、挑選的料理資料庫。您可以直接點擊下方外部熱門食譜網站找尋靈感，或透過系統中的精選卡片牆與分類快速過濾您的私房菜！
+        </p>
+      </div>
 
-    <div class="search-wrapper" style="margin-top: 20px;">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="recipe-search" placeholder="輸入料理關鍵字搜尋靈感..." />
-    </div>
+      <!-- 外部食譜網站推薦快捷專區 -->
+      <div style="margin-bottom: 6px;">
+        <h2>🌐 實用日常料理網站快捷專區</h2>
+      </div>
+      <div class="external-links-grid">
+        <a href="https://icook.tw/" target="_blank" class="external-link-card">
+          <div class="external-link-icon">🍳</div>
+          <div class="external-link-info">
+            <h3>愛料理 iCook</h3>
+            <p>全台最大料理平台，30萬+食譜</p>
+          </div>
+        </a>
+        <a href="https://cookpad.com/tw" target="_blank" class="external-link-card">
+          <div class="external-link-icon">🥗</div>
+          <div class="external-link-info">
+            <h3>Cookpad</h3>
+            <p>全球家庭主廚的家常菜社群</p>
+          </div>
+        </a>
+      </div>
 
-    <!-- 快速分類篩選 -->
-    <div class="filter-tags" id="filter-tags">
-      <button class="filter-tag active" data-category="全部">全部顯示</button>
-      <button class="filter-tag" data-category="主菜">🥩 葷素主菜</button>
-      <button class="filter-tag" data-category="蔬食">🥬 季節蔬菜</button>
-      <button class="filter-tag" data-category="湯品">🍲 湯品 / 鍋物</button>
-      <button class="filter-tag" data-category="點心">🍎 點心 / 其他</button>
-    </div>
+      <div class="search-wrapper" style="margin-top: 20px;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="recipe-search" placeholder="輸入料理關鍵字搜尋靈感..." />
+      </div>
 
-    <!-- 質感日常料理精選網頁牆展示區 -->
-    <div style="margin-bottom: 8px;">
-      <h2>🌟 想吃的料理區</h2>
-    </div>
-    <div id="recipe-showcase-container" class="web-showcase-grid">
-      <!-- 動態生成的精選卡片會在這裡顯示 -->
-    </div>
+      <!-- 快速分類篩選 -->
+      <div class="filter-tags" id="filter-tags">
+        <button class="filter-tag active" data-category="全部">全部顯示</button>
+        <button class="filter-tag" data-category="主菜">🥩 葷素主菜</button>
+        <button class="filter-tag" data-category="蔬食">🥬 季節蔬菜</button>
+        <button class="filter-tag" data-category="湯品">🍲 湯品 / 鍋物</button>
+        <button class="filter-tag" data-category="點心">🍎 點心 / 其他</button>
+      </div>
 
-    <div class="form-container">
-      <h2 id="recipe-form-title">✨ 新增參考料理</h2>
-      <form id="recipe-add-form">
-        <label>料理名稱：<input type="text" id="recipe-name" required placeholder="例如：三杯雞、清炒高麗菜" /></label>
-        <label>料理分類：
-          <select id="recipe-category">
-            <option value="主菜">主菜 / 葷食</option>
-            <option value="蔬食">蔬菜 / 素食</option>
-            <option value="湯品">湯品 / 鍋物</option>
-            <option value="點心">點心 / 水果 / 其他</option>
-          </select>
-        </label>
-        <label>建議備料：<input type="text" id="recipe-ingredients" required placeholder="例如：雞肉、九層塔、蒜頭、醬油" /></label>
-        <label>烹調備註 / 口味方向：<textarea id="recipe-steps" rows="3" placeholder="例如：適合當作週三主菜，香氣濃郁下飯"></textarea></label>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="submit" id="recipe-submit-btn" style="flex: 2;">確認新增參考料理</button>
-          <button type="button" id="recipe-cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
-        </div>
-      </form>
+      <!-- 質感日常料理精選展示牆 -->
+      <div style="margin-bottom: 8px;">
+        <h2>🌟 日常料理精選展示牆</h2>
+      </div>
+      <div id="recipe-showcase-container" class="web-showcase-grid"></div>
+
+      <div class="form-container">
+        <h2 id="recipe-form-title">✨ 新增參考料理</h2>
+        <form id="recipe-add-form">
+          <label>料理名稱：<input type="text" id="recipe-name" required placeholder="例如：三杯雞、清炒高麗菜" /></label>
+          <label>料理分類：
+            <select id="recipe-category">
+              <option value="主菜">主菜 / 葷食</option>
+              <option value="蔬食">蔬菜 / 素食</option>
+              <option value="湯品">湯品 / 鍋物</option>
+              <option value="點心">點心 / 水果 / 其他</option>
+            </select>
+          </label>
+          <label>建議備料：<input type="text" id="recipe-ingredients" required placeholder="例如：雞肉、九層塔、蒜頭、醬油" /></label>
+          <label>烹調備註 / 口味方向：<textarea id="recipe-steps" rows="3" placeholder="例如：適合當作週三主菜，香氣濃郁下飯"></textarea></label>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button type="submit" id="recipe-submit-btn" style="flex: 2;">確認新增參考料理</button>
+            <button type="button" id="recipe-cancel-edit" class="secondary" style="flex: 1; display: none;">取消</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -582,6 +648,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, Timestamp } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDOzYayn2PmFJGLEqQ2S7Sy_ullVVg1ae8",
@@ -595,354 +663,394 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    // 頁籤切換邏輯
-    const tabInventoryBtn = document.getElementById('tab-inventory-btn');
-    const tabRecipeBtn = document.getElementById('tab-recipe-btn');
-    const tabInventory = document.getElementById('tab-inventory');
-    const tabRecipe = document.getElementById('tab-recipe');
+    // 登入介面元素
+    const authContainer = document.getElementById('auth-container');
+    const appContainer = document.getElementById('app-container');
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    const loginError = document.getElementById('login-error');
+    const logoutBtn = document.getElementById('logout-btn');
 
-    tabInventoryBtn.addEventListener('click', () => setActiveTab(tabInventoryBtn, tabInventory));
-    tabRecipeBtn.addEventListener('click', () => setActiveTab(tabRecipeBtn, tabRecipe));
-
-    function setActiveTab(btn, content) {
-      [tabInventoryBtn, tabRecipeBtn].forEach(b => b.classList.remove('active'));
-      [tabInventory, tabRecipe].forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      content.classList.add('active');
-    }
-
-    // --- 全域資料暫存 ---
-    let allItems = [];
-    let allRecipes = [];
-    let currentCategoryFilter = "全部";
-
-    // --- 庫存管理相關邏輯 ---
-    const sectionsDiv = document.getElementById('sections');
-    const form = document.getElementById('add-form');
-    const searchInput = document.getElementById('search');
-    const formTitle = document.getElementById('form-title');
-    const submitBtn = document.getElementById('submit-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit');
-
-    let editingId = null;
-    const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2","pantry"];
-    const sectionElements = {};
-
-    if (sectionsDiv) {
-      locations.forEach(loc => {
-        const section = document.createElement('div');
-        section.className = 'section';
-        
-        let titleName = "";
-        let icon = "❄️";
-        if (loc.includes("fridge")) {
-          titleName = `冰箱 ${loc.split("-")[1]}`;
-          icon = "❄️";
-        } else if (loc.includes("storage")) {
-          titleName = `糧秣庫 ${loc.split("-")[1]}`;
-          icon = "📦";
-        } else if (loc === "pantry") {
-          titleName = `水果儲放區`;
-          icon = "🍎";
-        }
-
-        section.innerHTML = `<h2>${icon} ${titleName}</h2><ul id="${loc}-list"></ul>`;
-        sectionsDiv.appendChild(section);
-        sectionElements[loc] = section.querySelector('ul');
-      });
-    }
-
-    function toDate(value) {
-      if (!value) return null;
-      if (typeof value === 'object' && typeof value.toDate === 'function') return value.toDate();
-      const d = new Date(value);
-      return !isNaN(d) ? d : null;
-    }
-
-    function renderList(items) {
-      locations.forEach(loc => {
-        if (sectionElements[loc]) sectionElements[loc].innerHTML = "";
-      });
-
-      if (!Array.isArray(items)) return;
-
-      items.forEach((item) => {
-        if (!item || !item.name) return;
-
-        const loc = item.location || "fridge-1";
-        const li = document.createElement('li');
-        li.className = 'item';
-
-        const expiryDate = toDate(item.expiry);
-        const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        let badgeHtml = "";
-        if (expiryDate) {
-          const expTime = new Date(expiryDate);
-          expTime.setHours(0, 0, 0, 0);
-          const diffDays = Math.round((expTime - today) / (1000 * 60 * 60 * 24));
-
-          if (diffDays < 0) {
-            li.classList.add("expired");
-            badgeHtml = `<span class="badge expired">已過期 ${Math.abs(diffDays)} 天</span>`;
-          } else if (diffDays === 0) {
-            li.classList.add("expiring");
-            badgeHtml = `<span class="badge expiring">今天到期</span>`;
-          } else if (diffDays <= 3) {
-            li.classList.add("expiring");
-            badgeHtml = `<span class="badge expiring">剩餘 ${diffDays} 天</span>`;
-          }
-        }
-
-        li.innerHTML = `
-          <div class="item-info">
-            <div class="item-header-row">
-              <span class="item-name">${item.name}</span>
-              ${badgeHtml}
-            </div>
-            <span class="item-detail">數量：${item.amount || "未填"} &nbsp;|&nbsp; 期限：${expiryText}</span>
-          </div>
-        `;
-
-        const actions = document.createElement('span');
-        actions.className = 'actions';
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = "編輯";
-        editBtn.className = "edit-btn";
-        editBtn.onclick = () => {
-          document.getElementById('name').value = item.name;
-          document.getElementById('amount').value = item.amount || "";
-          document.getElementById('expiry').value = expiryDate ? expiryDate.toISOString().split("T")[0] : "";
-          document.getElementById('location').value = loc;
-          editingId = item.id;
-          
-          formTitle.textContent = "✏️ 編輯食材";
-          submitBtn.textContent = "確認更新";
-          cancelEditBtn.style.display = "block";
-          
-          document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = "刪除";
-        delBtn.className = "danger";
-        delBtn.onclick = async () => {
-          if (confirm(`確定要刪除「${item.name}」嗎？`)) {
-            try { await deleteDoc(doc(db, "ingredients", item.id)); } catch (err) { console.error(err); }
-          }
-        };
-
-        actions.appendChild(editBtn);
-        actions.appendChild(delBtn);
-        li.appendChild(actions);
-
-        if (sectionElements[loc]) {
-          sectionElements[loc].appendChild(li);
-        } else {
-          sectionElements["fridge-1"].appendChild(li);
-        }
-      });
-    }
-
-    cancelEditBtn.addEventListener('click', () => resetForm());
-
-    function resetForm() {
-      form.reset();
-      editingId = null;
-      formTitle.textContent = "✨ 新增食材";
-      submitBtn.textContent = "確認新增";
-      cancelEditBtn.style.display = "none";
-    }
-
-    onSnapshot(collection(db, "ingredients"), (snapshot) => {
-      allItems = [];
-      snapshot.forEach((docSnap) => allItems.push({ id: docSnap.id, ...docSnap.data() }));
-      allItems.sort((a, b) => (toDate(a.expiry) || new Date(8640000000000000)) - (toDate(b.expiry) || new Date(8640000000000000)));
-      renderList(allItems);
+    // 監聽登入狀態
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authContainer.style.display = 'none';
+        appContainer.style.display = 'block';
+        initApp();
+      } else {
+        authContainer.style.display = 'block';
+        appContainer.style.display = 'none';
+      }
     });
 
-    searchInput.addEventListener('input', () => {
-      const keyword = searchInput.value.toLowerCase();
-      renderList(allItems.filter(item => (item.name || "").toLowerCase().includes(keyword)));
-    });
-
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const amount = document.getElementById('amount').value.trim();
-      const expiryVal = document.getElementById('expiry').value;
-      const location = document.getElementById('location').value;
-
-      if (!name) return alert("請輸入食材名稱");
-
+    // 點擊 Google 登入按鈕
+    googleLoginBtn.addEventListener('click', async () => {
+      loginError.style.display = 'none';
       try {
-        if (editingId) {
-          await updateDoc(doc(db, "ingredients", editingId), {
-            name, amount, expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, location, updatedAt: new Date()
-          });
-        } else {
-          await addDoc(collection(db, "ingredients"), {
-            name, amount, expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, location, createdAt: new Date()
-          });
-        }
-        resetForm();
+        await signInWithPopup(auth, provider);
       } catch (err) {
         console.error(err);
-        alert("儲存失敗");
+        loginError.textContent = "Google 登入失敗：" + err.message;
+        loginError.style.display = 'block';
       }
     });
 
-    // --- 質感網頁風：料理參考庫相關邏輯 ---
-    const recipeShowcaseContainer = document.getElementById('recipe-showcase-container');
-    const recipeAddForm = document.getElementById('recipe-add-form');
-    const recipeSearchInput = document.getElementById('recipe-search');
-    const recipeFormTitle = document.getElementById('recipe-form-title');
-    const recipeSubmitBtn = document.getElementById('recipe-submit-btn');
-    const recipeCancelEditBtn = document.getElementById('recipe-cancel-edit');
-    const filterTagBtns = document.querySelectorAll('.filter-tag');
+    // 處理登出
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.error(err);
+      }
+    });
 
-    let editingRecipeId = null;
+    // 主程式初始化函數
+    function initApp() {
+      const tabInventoryBtn = document.getElementById('tab-inventory-btn');
+      const tabRecipeBtn = document.getElementById('tab-recipe-btn');
+      const tabInventory = document.getElementById('tab-inventory');
+      const tabRecipe = document.getElementById('tab-recipe');
 
-    function renderRecipes(recipes) {
-      if (!recipeShowcaseContainer) return;
-      recipeShowcaseContainer.innerHTML = "";
+      tabInventoryBtn.onclick = () => setActiveTab(tabInventoryBtn, tabInventory);
+      tabRecipeBtn.onclick = () => setActiveTab(tabRecipeBtn, tabRecipe);
 
-      if (!Array.isArray(recipes) || recipes.length === 0) {
-        recipeShowcaseContainer.innerHTML = `
-          <div style="grid-column: 1 / -1; background: #fff; padding: 24px; border-radius: 12px; text-align: center; color: var(--text-sub); border: 1px solid var(--border-color);">
-            沒有找到符合條件的料理靈感，請試著切換分類或透過下方表單新增新的參考菜色！
-          </div>`;
-        return;
+      function setActiveTab(btn, content) {
+        [tabInventoryBtn, tabRecipeBtn].forEach(b => b.classList.remove('active'));
+        [tabInventory, tabRecipe].forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        content.classList.add('active');
       }
 
-      recipes.forEach((recipe) => {
-        const catClass = recipe.category || '主菜';
-        const card = document.createElement('div');
-        card.className = 'recipe-showcase-card';
+      const sectionsDiv = document.getElementById('sections');
+      const form = document.getElementById('add-form');
+      const searchInput = document.getElementById('search');
+      const formTitle = document.getElementById('form-title');
+      const submitBtn = document.getElementById('submit-btn');
+      const cancelEditBtn = document.getElementById('cancel-edit');
 
-        card.innerHTML = `
-          <div class="recipe-card-banner ${catClass}">
-            <div class="recipe-card-title">
-              <span>${recipe.name}</span>
-              <span class="badge category">${catClass}</span>
-            </div>
-          </div>
-          <div class="recipe-card-body">
-            <div class="recipe-meta-row">
-              <span>🛒 <strong>建議備料：</strong>${recipe.ingredients || '未填寫'}</span>
-            </div>
-            ${recipe.steps ? `<div class="recipe-steps-box">💡 <strong>烹調筆記：</strong><br>${recipe.steps}</div>` : ''}
-          </div>
-          <div class="recipe-card-footer"></div>
-        `;
+      let editingId = null;
+      const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2","pantry"];
+      const sectionElements = {};
 
-        const footer = card.querySelector('.recipe-card-footer');
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = "編輯";
-        editBtn.className = "edit-btn";
-        editBtn.onclick = () => {
-          document.getElementById('recipe-name').value = recipe.name;
-          document.getElementById('recipe-category').value = recipe.category || '主菜';
-          document.getElementById('recipe-ingredients').value = recipe.ingredients || '';
-          document.getElementById('recipe-steps').value = recipe.steps || '';
-          editingRecipeId = recipe.id;
-
-          recipeFormTitle.textContent = "✏️ 編輯參考料理";
-          recipeSubmitBtn.textContent = "確認更新料理";
-          recipeCancelEditBtn.style.display = "block";
-
-          recipeAddForm.scrollIntoView({ behavior: 'smooth' });
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = "刪除";
-        delBtn.className = "danger";
-        delBtn.onclick = async () => {
-          if (confirm(`確定要刪除參考料理「${recipe.name}」嗎？`)) {
-            try { await deleteDoc(doc(db, "recipes", recipe.id)); } catch (err) { console.error(err); }
+      if (sectionsDiv && sectionsDiv.children.length === 0) {
+        locations.forEach(loc => {
+          const section = document.createElement('div');
+          section.className = 'section';
+          
+          let titleName = "";
+          let icon = "❄️";
+          if (loc.includes("fridge")) {
+            titleName = `冰箱 ${loc.split("-")[1]}`;
+            icon = "❄️";
+          } else if (loc.includes("storage")) {
+            titleName = `糧秣庫 ${loc.split("-")[1]}`;
+            icon = "📦";
+          } else if (loc === "pantry") {
+            titleName = `水果儲放區`;
+            icon = "🍎";
           }
+
+          section.innerHTML = `<h2>${icon} ${titleName}</h2><ul id="${loc}-list"></ul>`;
+          sectionsDiv.appendChild(section);
+          sectionElements[loc] = section.querySelector('ul');
+        });
+      } else {
+        locations.forEach(loc => {
+          sectionElements[loc] = document.getElementById(`${loc}-list`);
+        });
+      }
+
+      function toDate(value) {
+        if (!value) return null;
+        if (typeof value === 'object' && typeof value.toDate === 'function') return value.toDate();
+        const d = new Date(value);
+        return !isNaN(d) ? d : null;
+      }
+
+      let allItems = [];
+      function renderList(items) {
+        locations.forEach(loc => {
+          if (sectionElements[loc]) sectionElements[loc].innerHTML = "";
+        });
+
+        if (!Array.isArray(items)) return;
+
+        items.forEach((item) => {
+          if (!item || !item.name) return;
+
+          const loc = item.location || "fridge-1";
+          const li = document.createElement('li');
+          li.className = 'item';
+
+          const expiryDate = toDate(item.expiry);
+          const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          let badgeHtml = "";
+          if (expiryDate) {
+            const expTime = new Date(expiryDate);
+            expTime.setHours(0, 0, 0, 0);
+            const diffDays = Math.round((expTime - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+              li.classList.add("expired");
+              badgeHtml = `<span class="badge expired">已過期 ${Math.abs(diffDays)} 天</span>`;
+            } else if (diffDays === 0) {
+              li.classList.add("expiring");
+              badgeHtml = `<span class="badge expiring">今天到期</span>`;
+            } else if (diffDays <= 3) {
+              li.classList.add("expiring");
+              badgeHtml = `<span class="badge expiring">剩餘 ${diffDays} 天</span>`;
+            }
+          }
+
+          li.innerHTML = `
+            <div class="item-info">
+              <div class="item-header-row">
+                <span class="item-name">${item.name}</span>
+                ${badgeHtml}
+              </div>
+              <span class="item-detail">數量：${item.amount || "未填"} &nbsp;|&nbsp; 期限：${expiryText}</span>
+            </div>
+          `;
+
+          const actions = document.createElement('span');
+          actions.className = 'actions';
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = "編輯";
+          editBtn.className = "edit-btn";
+          editBtn.onclick = () => {
+            document.getElementById('name').value = item.name;
+            document.getElementById('amount').value = item.amount || "";
+            document.getElementById('expiry').value = expiryDate ? expiryDate.toISOString().split("T")[0] : "";
+            document.getElementById('location').value = loc;
+            editingId = item.id;
+            
+            formTitle.textContent = "✏️ 編輯食材";
+            submitBtn.textContent = "確認更新";
+            cancelEditBtn.style.display = "block";
+            
+            document.getElementById('add-form-container').scrollIntoView({ behavior: 'smooth' });
+          };
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = "刪除";
+          delBtn.className = "danger";
+          delBtn.onclick = async () => {
+            if (confirm(`確定要刪除「${item.name}」嗎？`)) {
+              try { await deleteDoc(doc(db, "ingredients", item.id)); } catch (err) { console.error(err); }
+            }
+          };
+
+          actions.appendChild(editBtn);
+          actions.appendChild(delBtn);
+          li.appendChild(actions);
+
+          if (sectionElements[loc]) {
+            sectionElements[loc].appendChild(li);
+          } else {
+            sectionElements["fridge-1"].appendChild(li);
+          }
+        });
+      }
+
+      cancelEditBtn.onclick = () => resetForm();
+
+      function resetForm() {
+        form.reset();
+        editingId = null;
+        formTitle.textContent = "✨ 新增食材";
+        submitBtn.textContent = "確認新增";
+        cancelEditBtn.style.display = "none";
+      }
+
+      onSnapshot(collection(db, "ingredients"), (snapshot) => {
+        allItems = [];
+        snapshot.forEach((docSnap) => allItems.push({ id: docSnap.id, ...docSnap.data() }));
+        allItems.sort((a, b) => (toDate(a.expiry) || new Date(8640000000000000)) - (toDate(b.expiry) || new Date(8640000000000000)));
+        renderList(allItems);
+      });
+
+      searchInput.oninput = () => {
+        const keyword = searchInput.value.toLowerCase();
+        renderList(allItems.filter(item => (item.name || "").toLowerCase().includes(keyword)));
+      };
+
+      form.onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const amount = document.getElementById('amount').value.trim();
+        const expiryVal = document.getElementById('expiry').value;
+        const location = document.getElementById('location').value;
+
+        if (!name) return alert("請輸入食材名稱");
+
+        try {
+          if (editingId) {
+            await updateDoc(doc(db, "ingredients", editingId), {
+              name, amount, expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, location, updatedAt: new Date()
+            });
+          } else {
+            await addDoc(collection(db, "ingredients"), {
+              name, amount, expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, location, createdAt: new Date()
+            });
+          }
+          resetForm();
+        } catch (err) {
+          console.error(err);
+          alert("儲存失敗");
+        }
+      };
+
+      const recipeShowcaseContainer = document.getElementById('recipe-showcase-container');
+      const recipeAddForm = document.getElementById('recipe-add-form');
+      const recipeSearchInput = document.getElementById('recipe-search');
+      const recipeFormTitle = document.getElementById('recipe-form-title');
+      const recipeSubmitBtn = document.getElementById('recipe-submit-btn');
+      const recipeCancelEditBtn = document.getElementById('recipe-cancel-edit');
+      const filterTagBtns = document.querySelectorAll('.filter-tag');
+
+      let allRecipes = [];
+      let currentCategoryFilter = "全部";
+      let editingRecipeId = null;
+
+      function renderRecipes(recipes) {
+        if (!recipeShowcaseContainer) return;
+        recipeShowcaseContainer.innerHTML = "";
+
+        if (!Array.isArray(recipes) || recipes.length === 0) {
+          recipeShowcaseContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; background: #fff; padding: 24px; border-radius: 12px; text-align: center; color: var(--text-sub); border: 1px solid var(--border-color);">
+              沒有找到符合條件的料理靈感，請試著切換分類或透過下方表單新增新的參考菜色！
+            </div>`;
+          return;
+        }
+
+        recipes.forEach((recipe) => {
+          const catClass = recipe.category || '主菜';
+          const card = document.createElement('div');
+          card.className = 'recipe-showcase-card';
+
+          card.innerHTML = `
+            <div class="recipe-card-banner ${catClass}">
+              <div class="recipe-card-title">
+                <span>${recipe.name}</span>
+                <span class="badge category">${catClass}</span>
+              </div>
+            </div>
+            <div class="recipe-card-body">
+              <div class="recipe-meta-row">
+                <span>🛒 <strong>建議備料：</strong>${recipe.ingredients || '未填寫'}</span>
+              </div>
+              ${recipe.steps ? `<div class="recipe-steps-box">💡 <strong>烹調筆記：</strong><br>${recipe.steps}</div>` : ''}
+            </div>
+            <div class="recipe-card-footer"></div>
+          `;
+
+          const footer = card.querySelector('.recipe-card-footer');
+
+          const editBtn = document.createElement('button');
+          editBtn.textContent = "編輯";
+          editBtn.className = "edit-btn";
+          editBtn.onclick = () => {
+            document.getElementById('recipe-name').value = recipe.name;
+            document.getElementById('recipe-category').value = recipe.category || '主菜';
+            document.getElementById('recipe-ingredients').value = recipe.ingredients || '';
+            document.getElementById('recipe-steps').value = recipe.steps || '';
+            editingRecipeId = recipe.id;
+
+            recipeFormTitle.textContent = "✏️ 編輯參考料理";
+            recipeSubmitBtn.textContent = "確認更新料理";
+            recipeCancelEditBtn.style.display = "block";
+
+            recipeAddForm.scrollIntoView({ behavior: 'smooth' });
+          };
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = "刪除";
+          delBtn.className = "danger";
+          delBtn.onclick = async () => {
+            if (confirm(`確定要刪除參考料理「${recipe.name}」嗎？`)) {
+              try { await deleteDoc(doc(db, "recipes", recipe.id)); } catch (err) { console.error(err); }
+            }
+          };
+
+          footer.appendChild(editBtn);
+          footer.appendChild(delBtn);
+          recipeShowcaseContainer.appendChild(card);
+        });
+      }
+
+      function filterAndRenderRecipes() {
+        const keyword = (recipeSearchInput.value || "").toLowerCase();
+        const filtered = allRecipes.filter(recipe => {
+          const matchCategory = (currentCategoryFilter === "全部" || recipe.category === currentCategoryFilter);
+          const matchKeyword = (recipe.name || "").toLowerCase().includes(keyword) || 
+                               (recipe.ingredients || "").toLowerCase().includes(keyword) || 
+                               (recipe.steps || "").toLowerCase().includes(keyword);
+          return matchCategory && matchKeyword;
+        });
+        renderRecipes(filtered);
+      }
+
+      filterTagBtns.forEach(btn => {
+        btn.onclick = () => {
+          filterTagBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategoryFilter = btn.getAttribute('data-category');
+          filterAndRenderRecipes();
         };
-
-        footer.appendChild(editBtn);
-        footer.appendChild(delBtn);
-
-        recipeShowcaseContainer.appendChild(card);
       });
-    }
 
-    function filterAndRenderRecipes() {
-      const keyword = (recipeSearchInput.value || "").toLowerCase();
-      const filtered = allRecipes.filter(recipe => {
-        const matchCategory = (currentCategoryFilter === "全部" || recipe.category === currentCategoryFilter);
-        const matchKeyword = (recipe.name || "").toLowerCase().includes(keyword) || 
-                             (recipe.ingredients || "").toLowerCase().includes(keyword) || 
-                             (recipe.steps || "").toLowerCase().includes(keyword);
-        return matchCategory && matchKeyword;
-      });
-      renderRecipes(filtered);
-    }
+      recipeSearchInput.oninput = () => filterAndRenderRecipes();
+      recipeCancelEditBtn.onclick = () => resetRecipeForm();
 
-    filterTagBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterTagBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentCategoryFilter = btn.getAttribute('data-category');
+      function resetRecipeForm() {
+        recipeAddForm.reset();
+        editingRecipeId = null;
+        recipeFormTitle.textContent = "✨ 新裝參考料理";
+        recipeSubmitBtn.textContent = "確認新增參考料理";
+        recipeCancelEditBtn.style.display = "none";
+      }
+
+      onSnapshot(collection(db, "recipes"), (snapshot) => {
+        allRecipes = [];
+        snapshot.forEach((docSnap) => allRecipes.push({ id: docSnap.id, ...docSnap.data() }));
         filterAndRenderRecipes();
       });
-    });
 
-    recipeSearchInput.addEventListener('input', () => filterAndRenderRecipes());
+      recipeAddForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('recipe-name').value.trim();
+        const category = document.getElementById('recipe-category').value;
+        const ingredients = document.getElementById('recipe-ingredients').value.trim();
+        const steps = document.getElementById('recipe-steps').value.trim();
 
-    recipeCancelEditBtn.addEventListener('click', () => resetRecipeForm());
+        if (!name) return alert("請輸入料理名稱");
 
-    function resetRecipeForm() {
-      recipeAddForm.reset();
-      editingRecipeId = null;
-      recipeFormTitle.textContent = "✨ 新增參考料理";
-      recipeSubmitBtn.textContent = "確認新增參考料理";
-      recipeCancelEditBtn.style.display = "none";
-    }
-
-    onSnapshot(collection(db, "recipes"), (snapshot) => {
-      allRecipes = [];
-      snapshot.forEach((docSnap) => allRecipes.push({ id: docSnap.id, ...docSnap.data() }));
-      filterAndRenderRecipes();
-    }, (err) => {
-      console.error(err);
-    });
-
-    recipeAddForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const name = document.getElementById('recipe-name').value.trim();
-      const category = document.getElementById('recipe-category').value;
-      const ingredients = document.getElementById('recipe-ingredients').value.trim();
-      const steps = document.getElementById('recipe-steps').value.trim();
-
-      if (!name) return alert("請輸入料理名稱");
-
-      try {
-        if (editingRecipeId) {
-          await updateDoc(doc(db, "recipes", editingRecipeId), {
-            name, category, ingredients, steps, updatedAt: new Date()
-          });
-          editingRecipeId = null;
-        } else {
-          addDoc(collection(db, "recipes"), {
-            name, category, ingredients, steps, createdAt: new Date()
-          });
+        try {
+          if (editingRecipeId) {
+            await updateDoc(doc(db, "recipes", editingRecipeId), {
+              name, category, ingredients, steps, updatedAt: new Date()
+            });
+            editingRecipeId = null;
+          } else {
+            addDoc(collection(db, "recipes"), {
+              name, category, ingredients, steps, createdAt: new Date()
+            });
+          }
+          resetRecipeForm();
+        } catch (err) {
+          console.error(err);
+          alert("儲存失敗");
         }
-        resetRecipeForm();
-      } catch (err) {
-        console.error(err);
-        alert("儲存失敗");
-      }
-    });
+      };
+    }
   </script>
 </body>
 </html>
