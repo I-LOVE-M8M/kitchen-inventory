@@ -7,7 +7,7 @@
     body { font-family: Arial, sans-serif; margin: 20px; }
     h1 { color: #2c3e50; }
     .container { display: flex; flex-wrap: wrap; gap: 20px; }
-    .section { border: 1px solid #ccc; padding: 10px; width: 250px; }
+    .section { border: 1px solid #ccc; padding: 10px; width: 250px; flex: 1 1 250px; }
     .item { margin: 5px 0; }
     .item.expiring { color: red; font-weight: bold; }
     label { display: block; margin-top: 10px; }
@@ -15,6 +15,23 @@
     button { margin: 5px; padding: 5px 10px; }
     .actions { margin-left: 10px; }
     #search { margin: 15px 0; padding: 5px; width: 300px; }
+
+    /* 卡片模式 */
+    .card-mode .item {
+      border: 1px solid #aaa;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    /* 手機版調整 */
+    @media (max-width: 600px) {
+      .section { flex: 1 1 100%; max-width: 100%; }
+      #search { width: 100%; }
+      form { width: 100%; }
+      input, select, button { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -22,6 +39,9 @@
 
   <!-- 🔍 搜尋框 -->
   <input type="text" id="search" placeholder="輸入食材名稱搜尋...">
+
+  <!-- 🔘 顯示模式切換 -->
+  <button id="toggleMode">切換顯示模式</button>
 
   <div class="container" id="sections"></div>
 
@@ -65,11 +85,12 @@
     const sectionsDiv = document.getElementById('sections');
     const form = document.getElementById('add-form');
     const searchInput = document.getElementById('search');
+    const toggleBtn = document.getElementById('toggleMode');
 
     let editingId = null;
     let allItems = [];
+    let cardMode = false; // 預設清單模式
 
-    // 建立區域 DOM
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
     locations.forEach(loc => {
@@ -81,7 +102,6 @@
     });
 
     function renderList(items) {
-      // 清空所有區域
       locations.forEach(loc => sectionElements[loc].innerHTML = "");
 
       items.forEach((item) => {
@@ -120,6 +140,13 @@
 
         sectionElements[item.location].appendChild(li);
       });
+
+      // 切換模式樣式
+      if (cardMode) {
+        sectionsDiv.classList.add("card-mode");
+      } else {
+        sectionsDiv.classList.remove("card-mode");
+      }
     }
 
     onSnapshot(collection(db, "ingredients"), (snapshot) => {
@@ -128,7 +155,6 @@
         allItems.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // 排序：依保存期限由近到遠
       allItems.sort((a, b) => {
         const dateA = a.expiry.toDate ? a.expiry.toDate() : new Date(a.expiry);
         const dateB = b.expiry.toDate ? b.expiry.toDate() : new Date(b.expiry);
@@ -138,11 +164,15 @@
       renderList(allItems);
     });
 
-    // 搜尋功能
     searchInput.addEventListener('input', () => {
       const keyword = searchInput.value.toLowerCase();
       const filtered = allItems.filter(item => item.name.toLowerCase().includes(keyword));
       renderList(filtered);
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      cardMode = !cardMode;
+      renderList(allItems);
     });
 
     form.addEventListener('submit', async function(e) {
