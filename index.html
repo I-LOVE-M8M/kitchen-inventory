@@ -9,6 +9,7 @@
       --primary: #2c3e50;
       --accent: #3498db;
       --danger: #e74c3c;
+      --warning: #e67e22;
       --bg-color: #f4f7f6;
       --card-bg: #ffffff;
       --border-color: #ddd;
@@ -72,8 +73,16 @@
       gap: 8px;
     }
 
+    /* 快到期樣式 (橘色/警告) */
     .item.expiring {
+      border-color: var(--warning);
+      background-color: #fdfaf6;
+    }
+
+    /* 已過期樣式 (紅色/危險) */
+    .item.expired {
       border-color: var(--danger);
+      background-color: #fcf4f4;
     }
 
     .item-info {
@@ -94,12 +103,15 @@
       color: #666;
     }
 
-    .item.expiring .item-name {
-      color: var(--danger);
+    .item.expiring .item-name,
+    .item.expiring .item-detail {
+      color: var(--warning);
     }
 
-    .item.expiring .item-detail {
+    .item.expired .item-name,
+    .item.expired .item-detail {
       color: var(--danger);
+      font-weight: bold;
     }
 
     label {
@@ -248,7 +260,6 @@
         const section = document.createElement('div');
         section.className = 'section';
         
-        // 標題顯示判斷
         let titleName = "";
         if (loc.includes("fridge")) {
           titleName = `冰箱 ${loc.split("-")[1]}`;
@@ -291,19 +302,33 @@
         const expiryDate = toDate(item.expiry);
         const expiryText = expiryDate ? expiryDate.toISOString().split("T")[0] : "無期限";
 
+        // 計算效期狀態
         const today = new Date();
-        let isExpiring = false;
-        if (expiryDate) {
-          const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-          if (diffDays <= 3) isExpiring = true;
-        }
+        today.setHours(0, 0, 0, 0); // 將今天時間歸零以方便比較天數
 
-        if (isExpiring) li.classList.add("expiring");
+        let statusText = "";
+        if (expiryDate) {
+          const expTime = new Date(expiryDate);
+          expTime.setHours(0, 0, 0, 0);
+          
+          const diffDays = Math.round((expTime - today) / (1000 * 60 * 60 * 24));
+
+          if (diffDays < 0) {
+            li.classList.add("expired");
+            statusText = `❌ 已過期 (${Math.abs(diffDays)} 天)`;
+          } else if (diffDays === 0) {
+            li.classList.add("expiring");
+            statusText = `⚠️ 今天到期`;
+          } else if (diffDays <= 3) {
+            li.classList.add("expiring");
+            statusText = `⚠️ 剩餘 ${diffDays} 天到期`;
+          }
+        }
 
         li.innerHTML = `
           <div class="item-info">
             <span class="item-name">${item.name}</span>
-            <span class="item-detail">數量: ${item.amount || "未填"} | 期限: ${expiryText} ${isExpiring ? '⚠️就快到期' : ''}</span>
+            <span class="item-detail">數量: ${item.amount || "未填"} | 期限: ${expiryText} ${statusText ? '| ' + statusText : ''}</span>
           </div>
         `;
 
