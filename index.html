@@ -46,7 +46,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } 
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, Timestamp } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -75,11 +75,13 @@
       items.forEach((item) => {
         const li = document.createElement('li');
         li.className = 'item';
-        li.textContent = `${item.name} - ${item.amount} (期限: ${item.expiry})`;
+
+        // 轉換 Firestore Timestamp 或字串
+        const expiryDate = item.expiry.toDate ? item.expiry.toDate() : new Date(item.expiry);
+        li.textContent = `${item.name} - ${item.amount} (期限: ${expiryDate.toISOString().split("T")[0]})`;
 
         // 🔴 快到期提醒：剩 3 天以內顯示紅色
         const today = new Date();
-        const expiryDate = new Date(item.expiry);
         const diffDays = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
         if (diffDays <= 3) {
           li.classList.add("expiring");
@@ -93,7 +95,7 @@
         editBtn.onclick = () => {
           document.getElementById('name').value = item.name;
           document.getElementById('amount').value = item.amount;
-          document.getElementById('expiry').value = item.expiry;
+          document.getElementById('expiry').value = expiryDate.toISOString().split("T")[0];
           document.getElementById('location').value = item.location;
           editingId = item.id;
         };
@@ -135,7 +137,7 @@
         await updateDoc(doc(db, "ingredients", editingId), {
           name,
           amount,
-          expiry,
+          expiry: Timestamp.fromDate(new Date(expiry)), // ✅ 改成 Timestamp
           location,
           updatedAt: new Date()
         });
@@ -144,7 +146,7 @@
         await addDoc(collection(db, "ingredients"), {
           name,
           amount,
-          expiry,
+          expiry: Timestamp.fromDate(new Date(expiry)), // ✅ 改成 Timestamp
           location,
           createdAt: new Date()
         });
