@@ -89,8 +89,9 @@
 
     let editingId = null;
     let allItems = [];
-    let cardMode = false; // 預設清單模式
+    let cardMode = false;
 
+    // ✅ 在這裡建立所有冰箱/糧秣庫區域 DOM
     const locations = ["fridge-1","fridge-2","fridge-3","fridge-4","fridge-5","storage-1","storage-2"];
     const sectionElements = {};
     locations.forEach(loc => {
@@ -141,7 +142,6 @@
         sectionElements[item.location].appendChild(li);
       });
 
-      // 切換模式樣式
       if (cardMode) {
         sectionsDiv.classList.add("card-mode");
       } else {
@@ -205,4 +205,3 @@
     });
   </script>
 </body>
-</html>
