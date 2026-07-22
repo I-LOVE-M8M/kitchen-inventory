@@ -605,7 +605,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, Timestamp } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
+    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -632,6 +632,14 @@
 
     let currentUserEmail = "";
 
+    // 1. 頁面載入時接收重新導向的登入結果
+    getRedirectResult(auth)
+      .catch((err) => {
+        console.error("Redirect login error:", err);
+        loginError.textContent = "登入失敗：" + err.message;
+        loginError.style.display = 'block';
+      });
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authContainer.style.display = 'none';
@@ -645,13 +653,14 @@
       }
     });
 
+    // 2. 將登入按鈕改為重新導向模式
     googleLoginBtn.addEventListener('click', async () => {
       loginError.style.display = 'none';
       try {
-        await signInWithPopup(auth, provider);
+        await signInWithRedirect(auth, provider);
       } catch (err) {
         console.error(err);
-        loginError.textContent = "Google 登入失敗：" + err.message;
+        loginError.textContent = "Google 登入導向失敗：" + err.message;
         loginError.style.display = 'block';
       }
     });
@@ -856,7 +865,7 @@
               amount, 
               expiry: expiryVal ? Timestamp.fromDate(new Date(expiryVal)) : null, 
               location, 
-              createdBy: currentUserEmail, // 自動記錄當前登入的使用者
+              createdBy: currentUserEmail, 
               createdAt: new Date()
             });
           }
@@ -953,8 +962,8 @@
         const filtered = allRecipes.filter(recipe => {
           const matchCategory = (currentCategoryFilter === "全部" || recipe.category === currentCategoryFilter);
           const matchKeyword = (recipe.name || "").toLowerCase().includes(keyword) || 
-                               (recipe.ingredients || "").toLowerCase().includes(keyword) || 
-                               (recipe.steps || "").toLowerCase().includes(keyword);
+                             (recipe.ingredients || "").toLowerCase().includes(keyword) || 
+                             (recipe.steps || "").toLowerCase().includes(keyword);
           return matchCategory && matchKeyword;
         });
         renderRecipes(filtered);
@@ -986,37 +995,6 @@
         recipeSubmitBtn.textContent = "確認新增參考料理";
         recipeCancelEditBtn.style.display = "none";
       }
-
-      recipeAddForm.onsubmit = async function(e) {
-        e.preventDefault();
-        const name = document.getElementById('recipe-name').value.trim();
-        const category = document.getElementById('recipe-category').value;
-        const ingredients = document.getElementById('recipe-ingredients').value.trim();
-        const steps = document.getElementById('recipe-steps').value.trim();
-
-        if (!name) return alert("請輸入料理名稱");
-
-        try {
-          if (editingRecipeId) {
-            await updateDoc(doc(db, "recipes", editingRecipeId), {
-              name, category, ingredients, steps, updatedAt: new Date()
-            });
-          } else {
-            await addDoc(collection(db, "recipes"), {
-              name, 
-              category, 
-              ingredients, 
-              steps, 
-              createdBy: currentUserEmail, // 自動記錄當前登入的使用者
-              createdAt: new Date()
-            });
-          }
-          resetRecipeForm();
-        } catch (err) {
-          console.error(err);
-          alert("儲存失敗");
-        }
-      };
     }
   </script>
 </body>
