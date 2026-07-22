@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>廚房與每週菜單管理系統</title>
+
+  // 偵測是否為 LINE、FB、IG 等 App 的內建瀏覽器
+(function checkInAppBrowser() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const isInApp = (ua.indexOf("LINE") > -1) || (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
+
+  if (isInApp) {
+    alert("⚠️ 偵測到您正在使用 LINE/FB 內建瀏覽器！\n\nGoogle 基於安全政策會阻擋內建瀏覽器登入。\n請點擊右下角「...」選單，選擇「在預設瀏覽器（Safari/Chrome）中開啟」即可順利登入！");
+  }
+})();
+  <style>
+    
   <style>
     :root {
       --primary: #2c3e50;
