@@ -618,7 +618,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, Timestamp } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } 
+    
+    // ✅ 已正確引用 signInWithPopup
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -635,13 +637,13 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     auth.useDeviceLanguage();
+    
     const provider = new GoogleAuthProvider();
     provider.addScope("email");
     provider.addScope("profile");
-
-provider.setCustomParameters({
-  prompt: "select_account"
-});
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
 
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
@@ -652,22 +654,7 @@ provider.setCustomParameters({
 
     let currentUserEmail = "";
 
-    // 1. 頁面載入時接收重新導向的登入結果
-    getRedirectResult(auth)
-.then((result)=>{
-
-    if(result){
-        console.log("登入成功");
-    }
-
-})
-.catch((err)=>{
-
-    console.error(err);
-
-    alert(err.message);
-
-});
+    // ✅ 1. 自動監聽登入/登出狀態（保留這段即可，已刪除 getRedirectResult）
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authContainer.style.display = 'none';
@@ -681,29 +668,22 @@ provider.setCustomParameters({
       }
     });
 
-    // 2. 將登入按鈕改為重新導向模式
+    // ✅ 2. 按鈕改為彈出視窗模式 (Popup)（已清理多餘的殘留語法）
     googleLoginBtn.addEventListener('click', async () => {
       loginError.style.display = 'none';
-     try {
+      try {
+        await signInWithPopup(auth, provider);
+        console.log("登入成功！");
+      } catch (err) {
+        console.error(err);
+        if (err.code === 'auth/popup-closed-by-user') return;
 
-  provider.setCustomParameters({
-    prompt: "select_account"
-  });
-
-  await signInWithRedirect(auth, provider);
-
-} catch (err) {
-
-  console.error(err);
-
-  loginError.textContent =
-    "Google 登入失敗：" + err.message;
-
-  loginError.style.display = "block";
-
-}
+        loginError.textContent = "Google 登入失敗：" + err.message;
+        loginError.style.display = "block";
+      }
     });
 
+    // 登出按鈕
     logoutBtn.addEventListener('click', async () => {
       try {
         await signOut(auth);
@@ -712,6 +692,7 @@ provider.setCustomParameters({
       }
     });
 
+    // 應用程式核心邏輯
     function initApp() {
       const tabInventoryBtn = document.getElementById('tab-inventory-btn');
       const tabRecipeBtn = document.getElementById('tab-recipe-btn');
