@@ -621,7 +621,14 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    auth.useDeviceLanguage();
     const provider = new GoogleAuthProvider();
+    provider.addScope("email");
+    provider.addScope("profile");
+
+provider.setCustomParameters({
+  prompt: "select_account"
+});
 
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
@@ -634,12 +641,20 @@
 
     // 1. 頁面載入時接收重新導向的登入結果
     getRedirectResult(auth)
-      .catch((err) => {
-        console.error("Redirect login error:", err);
-        loginError.textContent = "登入失敗：" + err.message;
-        loginError.style.display = 'block';
-      });
+.then((result)=>{
 
+    if(result){
+        console.log("登入成功");
+    }
+
+})
+.catch((err)=>{
+
+    console.error(err);
+
+    alert(err.message);
+
+});
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authContainer.style.display = 'none';
@@ -656,13 +671,24 @@
     // 2. 將登入按鈕改為重新導向模式
     googleLoginBtn.addEventListener('click', async () => {
       loginError.style.display = 'none';
-      try {
-        await signInWithRedirect(auth, provider);
-      } catch (err) {
-        console.error(err);
-        loginError.textContent = "Google 登入導向失敗：" + err.message;
-        loginError.style.display = 'block';
-      }
+     try {
+
+  provider.setCustomParameters({
+    prompt: "select_account"
+  });
+
+  await signInWithRedirect(auth, provider);
+
+} catch (err) {
+
+  console.error(err);
+
+  loginError.textContent =
+    "Google 登入失敗：" + err.message;
+
+  loginError.style.display = "block";
+
+}
     });
 
     logoutBtn.addEventListener('click', async () => {
