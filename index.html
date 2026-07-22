@@ -995,6 +995,37 @@
         recipeSubmitBtn.textContent = "確認新增參考料理";
         recipeCancelEditBtn.style.display = "none";
       }
+
+      recipeAddForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('recipe-name').value.trim();
+        const category = document.getElementById('recipe-category').value;
+        const ingredients = document.getElementById('recipe-ingredients').value.trim();
+        const steps = document.getElementById('recipe-steps').value.trim();
+
+        if (!name) return alert("請輸入料理名稱");
+
+        try {
+          if (editingRecipeId) {
+            await updateDoc(doc(db, "recipes", editingRecipeId), {
+              name, category, ingredients, steps, updatedAt: new Date()
+            });
+          } else {
+            await addDoc(collection(db, "recipes"), {
+              name,
+              category,
+              ingredients,
+              steps,
+              createdBy: currentUserEmail,
+              createdAt: new Date()
+            });
+          }
+          resetRecipeForm();
+        } catch (err) {
+          console.error(err);
+          alert("儲存參考料理失敗");
+        }
+      };
     }
   </script>
 </body>
